@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import time
+import datetime
 from typing import TYPE_CHECKING, List
 from src.utils.logger import configurar_logger
 from src.utils.exceptions import (
@@ -141,48 +142,94 @@ class EtlService:
             raise RecalculoError(f"Fallo recalculo: {e}") from e
 
     def run_fase2_update(self, progress_callback_text=None, progress_callback_percent=None, scopes: List[str] = None):
-        """Actualiza detalles (descripción/productos/estado) desde la web."""
+        """
+        Lógica híbrida de actualización con LÍMITE DE SEGURIDAD.
+        """
         emit_text, emit_percent = self._create_progress_emitters(progress_callback_text, progress_callback_percent)
+        scopes = scopes or ['all']
         
         try:
-            # Refresco de sesión (Best Effort)
-            if hasattr(self.scraper_service, 'check_session'):
-                 self.scraper_service.check_session(emit_text)
+            # 1. ACTUALIZACIÓN MASIVA DE ESTADOS (Candidatas)
+            if 'candidatas' in scopes or 'all' in scopes:
+                emit_text("Analizando fechas de candidatas activas...")
+                fecha_min, fecha_max = self.db_service.obtener_rango_fechas_candidatas_activas()
+                
+                if fecha_min and fecha_max:
+                    hoy = datetime.date.today()
+                    
+                    # Normalización segura a date
+                    f_min_safe = fecha_min.date() if isinstance(fecha_min, datetime.datetime) else fecha_min
+                    f_max_safe = fecha_max.date() if isinstance(fecha_max, datetime.datetime) else fecha_max
 
-            emit_text("Seleccionando CAs para actualizar...")
-            lists_to_process = []
+                    # --- LÓGICA DE SEGURIDAD (NUEVO) ---
+                    # Las Compras Ágiles expiran rápido. No tiene sentido actualizar
+                    # estados buscando más allá de 10 días atrás.
+                    limite_atras = hoy - datetime.timedelta(days=5)
+                    
+                    if f_min_safe < limite_atras:
+                        emit_text(f"Ajustando rango: {f_min_safe} es muy antiguo. Usando {limite_atras}.")
+                        f_min_safe = limite_atras
+                    # -----------------------------------
+
+                    fecha_tope = max(f_max_safe, hoy)
+                    
+                    emit_text(f"Actualizando estados ({f_min_safe} al {fecha_tope})...")
+                    
+                    filtros = {
+                        'date_from': f_min_safe.strftime('%Y-%m-%d'), 
+                        'date_to': fecha_tope.strftime('%Y-%m-%d')
+                    }
+                    
+                    # Ejecutamos Scraper de Listado
+                    datos_barrido = self.scraper_service.run_scraper_listado(
+                        emit_text, filtros, max_paginas=0 
+                    )
+                    
+                    if datos_barrido:
+                        emit_text(f"Sincronizando {len(datos_barrido)} registros...")
+                        self.db_service.insertar_o_actualizar_licitaciones_raw(datos_barrido)
+                        self.db_service.cerrar_licitaciones_vencidas_localmente()
+                    else:
+                        emit_text("No se detectaron cambios en candidatas.")
+                else:
+                    emit_text("No hay candidatas activas para actualizar.")
+
+            # 2. ACTUALIZACIÓN DE DETALLE (Seguimiento / Ofertadas)
+            needs_fase2 = 'seguimiento' in scopes or 'ofertadas' in scopes or 'all' in scopes
             
-            # Selección de alcance
-            scopes = scopes or ['all']
-            if 'all' in scopes:
-                lists_to_process.append(self.db_service.obtener_datos_tab3_seguimiento())
-                lists_to_process.append(self.db_service.obtener_datos_tab4_ofertadas())
-                lists_to_process.append(self.db_service.obtener_candidatas_top_para_actualizar(umbral_minimo=10))
-            else:
-                if 'seguimiento' in scopes:
+            if needs_fase2:
+                # Refresco de sesión solo si vamos a entrar a fichas
+                if hasattr(self.scraper_service, 'check_session'):
+                    self.scraper_service.check_session(emit_text)
+
+                emit_text("Seleccionando licitaciones para detalle...")
+                lists_to_process = []
+                
+                if 'all' in scopes:
                     lists_to_process.append(self.db_service.obtener_datos_tab3_seguimiento())
-                if 'ofertadas' in scopes:
                     lists_to_process.append(self.db_service.obtener_datos_tab4_ofertadas())
-                if 'candidatas' in scopes:
-                    lists_to_process.append(self.db_service.obtener_candidatas_top_para_actualizar(umbral_minimo=10))
-            
-            # Deduplicación por ID
-            mapa = {}
-            for lst in lists_to_process:
-                for ca in lst: mapa[ca.ca_id] = ca
-            
-            procesar = list(mapa.values())
-            
-            if not procesar:
-                emit_text("Nada para actualizar.")
-                emit_percent(100)
-                return
+                else:
+                    if 'seguimiento' in scopes:
+                        lists_to_process.append(self.db_service.obtener_datos_tab3_seguimiento())
+                    if 'ofertadas' in scopes:
+                        lists_to_process.append(self.db_service.obtener_datos_tab4_ofertadas())
+                
+                # Deduplicación por ID
+                mapa = {}
+                for lst in lists_to_process:
+                    for ca in lst: mapa[ca.ca_id] = ca
+                
+                procesar = list(mapa.values())
+                
+                if procesar:
+                    emit_text(f"Actualizando detalle de {len(procesar)} CAs...")
+                    self._procesar_lista_fase_2(procesar, emit_text, emit_percent)
+                elif not ('candidatas' in scopes): 
+                    # Si no había candidatas y tampoco fase 2, avisamos
+                    emit_text("Nada pendiente en Seguimiento/Ofertadas.")
 
-            emit_text(f"Actualizando {len(procesar)} CAs desde web...")
-            self._procesar_lista_fase_2(procesar, emit_text, emit_percent)
-            
         except Exception as e:
-             raise ScrapingFase2Error(f"Fallo actualización Fase 2: {e}") from e
+             raise ScrapingFase2Error(f"Fallo actualización selectiva: {e}") from e
         
         emit_text("Actualización finalizada.")
         emit_percent(100)
@@ -192,8 +239,8 @@ class EtlService:
         self.score_engine.recargar_reglas() # Asegurar reglas frescas
 
         for i, lic in enumerate(lista_cas):
-            # Barra de progreso entre 0% y 95%
-            percent = int(((i+1)/total)*95)
+            # Barra de progreso
+            percent = int(((i+1)/total)*100)
             emit_percent(percent)
             emit_text(f"Actualizando: {lic.codigo_ca}")
             
@@ -228,8 +275,13 @@ class EtlService:
 
     def run_limpieza_automatica(self):
         try: 
+            # 1. Primero cerramos las que acaban de vencer por fecha
+            cerradas = self.db_service.cerrar_licitaciones_vencidas_localmente()
+            
+            # 2. Luego borramos la basura muy antigua (30 días)
             eliminados = self.db_service.limpiar_registros_antiguos()
-            if eliminados > 0:
-                logger.info(f"Limpieza automática: {eliminados} registros purgados.")
+            
+            if eliminados > 0 or cerradas > 0:
+                logger.info(f"Limpieza: {cerradas} cerradas por fecha, {eliminados} borradas por antigüedad.")
         except Exception as e:
             logger.error(f"Error en limpieza: {e}")

@@ -2,7 +2,7 @@
 from typing import List, Dict, Tuple, Optional, Union, Set
 from datetime import datetime, timedelta
 from sqlalchemy.orm import sessionmaker, Session, joinedload
-from sqlalchemy import select, delete, or_, update
+from sqlalchemy import select, delete, or_, update, func
 from sqlalchemy.dialects.postgresql import insert
 
 from .db_models import (
@@ -50,7 +50,6 @@ class DbService:
         return existentes
 
     def _to_dict_safe(self, licitaciones: List[CaLicitacion]) -> List[Dict]:
-        """Convierte objetos ORM a diccionarios planos para exportación."""
         resultados = []
         for ca in licitaciones:
             resultados.append({
@@ -106,13 +105,14 @@ class DbService:
                     data_to_upsert.append(record)
                 
                 if data_to_upsert:
+                    # Upsert: Si el codigo existe, actualiza SOLO los campos que cambian dinámicamente
                     stmt = insert(CaLicitacion).values(data_to_upsert)
                     stmt = stmt.on_conflict_do_update(
                         index_elements=['codigo_ca'],
                         set_={
                             "proveedores_cotizando": stmt.excluded.proveedores_cotizando,
-                            "estado_ca_texto": stmt.excluded.estado_ca_texto,
-                            "fecha_cierre": stmt.excluded.fecha_cierre,
+                            "estado_ca_texto": stmt.excluded.estado_ca_texto, # Clave para cerrar o pasar a 2do llamado
+                            "fecha_cierre": stmt.excluded.fecha_cierre,       # Clave si se extiende el plazo
                             "estado_convocatoria": stmt.excluded.estado_convocatoria,
                             "monto_clp": stmt.excluded.monto_clp
                         }
@@ -126,7 +126,6 @@ class DbService:
                 raise e
 
     def actualizar_ca_con_fase_2(self, codigo_ca: str, datos_fase_2: Dict, puntuacion_total: int, detalle_completo: List[str]):
-        """Actualiza una licitación específica con los datos detallados (Fase 2)."""
         with self.session_factory() as session:
             try:
                 stmt = select(CaLicitacion).where(CaLicitacion.codigo_ca == codigo_ca)
@@ -176,25 +175,42 @@ class DbService:
     # --- CONSULTAS (RESTORED METHODS) ---
 
     def get_licitacion_by_id(self, ca_id: int) -> Optional[CaLicitacion]:
-        """Obtiene una licitación completa por su ID (usado por GUI detalle)."""
         with self.session_factory() as session:
-            # Usamos joinedload para traer relaciones y evitar errores de sesión cerrada en GUI
             stmt = select(CaLicitacion).options(
                 joinedload(CaLicitacion.organismo), 
                 joinedload(CaLicitacion.seguimiento)
             ).where(CaLicitacion.ca_id == ca_id)
             return session.scalars(stmt).first()
 
+    def obtener_rango_fechas_candidatas_activas(self) -> Tuple[Optional[datetime], Optional[datetime]]:
+        """
+        Devuelve (min_fecha_pub, max_fecha_pub) de las licitaciones en estado 'Candidata'
+        (es decir, NO favoritas y NO ofertadas) que actualmente están marcadas como 'Publicada'.
+        Se usa para el 'Barrido de Listado'.
+        """
+        with self.session_factory() as session:
+            # Subquery para excluir las que ya seguimos
+            subq = select(CaSeguimiento.ca_id).where(or_(CaSeguimiento.es_favorito == True, CaSeguimiento.es_ofertada == True, CaSeguimiento.es_oculta == True))
+            
+            stmt = select(
+                func.min(CaLicitacion.fecha_publicacion),
+                func.max(CaLicitacion.fecha_publicacion)
+            ).filter(
+                CaLicitacion.ca_id.notin_(subq),
+                # Buscamos solo sobre las que creemos que están vivas
+                or_(
+                    CaLicitacion.estado_ca_texto.ilike('%Publicada%'),
+                    CaLicitacion.estado_ca_texto.ilike('%Segundo%')
+                )
+            )
+            return session.execute(stmt).first()
+
     def limpiar_registros_antiguos(self, dias_retencion: int = 30) -> int:
-        """Elimina licitaciones viejas que no sean favoritas."""
         fecha_limite = datetime.now() - timedelta(days=dias_retencion)
         registros_eliminados = 0
         with self.session_factory() as session:
             try:
-                # Subconsulta: IDs de favoritas para protegerlas
                 subq = select(CaSeguimiento.ca_id).where(CaSeguimiento.es_favorito == True)
-                
-                # Borrar si: Fecha vieja AND (Estado no es 'Publicada' OR Estado Convocatoria cerrada) AND No es favorita
                 stmt = delete(CaLicitacion).where(
                     CaLicitacion.fecha_cierre < fecha_limite, 
                     CaLicitacion.estado_ca_texto.notin_(['Publicada', 'Publicada - Segundo llamado']),
@@ -209,6 +225,33 @@ class DbService:
                 logger.error(f"Error limpieza: {e}")
                 session.rollback()
         return registros_eliminados
+    
+    def cerrar_licitaciones_vencidas_localmente(self) -> int:
+        """
+        Busca licitaciones que siguen 'Publicadas' pero cuya fecha de cierre ya pasó.
+        Las marca como 'Cerrada' forzosamente.
+        """
+        ahora = datetime.now()
+        registros_afectados = 0
+        
+        with self.session_factory() as session:
+            try:
+                # Buscamos Publicada o 2do llamado que ya vencieron
+                stmt = update(CaLicitacion).where(
+                    CaLicitacion.fecha_cierre < ahora,
+                    CaLicitacion.estado_ca_texto.in_(['Publicada', 'Publicada - Segundo llamado'])
+                ).values(estado_ca_texto='Cerrada')
+                
+                result = session.execute(stmt)
+                registros_afectados = result.rowcount
+                session.commit()
+                
+                if registros_afectados > 0:
+                    logger.info(f"Mantenimiento Local: Se cerraron {registros_afectados} licitaciones vencidas.")
+            except Exception as e:
+                logger.error(f"Error cerrando vencidas: {e}")
+                session.rollback()
+        return registros_afectados
 
     def obtener_todas_candidatas_fase_1_para_recalculo(self) -> List[Dict]:
         with self.session_factory() as session:
@@ -230,15 +273,51 @@ class DbService:
             return session.scalars(stmt).all()
 
     def obtener_candidatas_top_para_actualizar(self, umbral_minimo: int = 10) -> List[CaLicitacion]:
+        # NOTA: Este método se mantiene para compatibilidad, pero la lógica fuerte
+        # de actualización de candidatas se mueve al "Barrido" (Listado).
         with self.session_factory() as session:
             subq = select(CaSeguimiento.ca_id).where(or_(CaSeguimiento.es_favorito == True, CaSeguimiento.es_ofertada == True))
-            stmt = select(CaLicitacion).filter(CaLicitacion.puntuacion_final >= umbral_minimo, CaLicitacion.ca_id.notin_(subq)).order_by(CaLicitacion.fecha_cierre.asc())
+            stmt = select(CaLicitacion).filter(
+                CaLicitacion.puntuacion_final >= umbral_minimo, 
+                CaLicitacion.ca_id.notin_(subq)
+            ).order_by(CaLicitacion.fecha_cierre.asc())
             return session.scalars(stmt).all()
 
     def obtener_datos_tab1_candidatas(self, umbral_minimo: int = 5) -> List[CaLicitacion]:
+        """
+        Devuelve SOLO las licitaciones 'Publicada' o 'Segundo llamado' que superan el puntaje,
+        excluyendo las que ya están en seguimiento, ofertadas u ocultas.
+        """
         with self.session_factory() as session:
-            subq = select(CaSeguimiento.ca_id).where(or_(CaSeguimiento.es_favorito == True, CaSeguimiento.es_ofertada == True, CaSeguimiento.es_oculta == True))
-            stmt = select(CaLicitacion).options(joinedload(CaLicitacion.seguimiento), joinedload(CaLicitacion.organismo).joinedload(CaOrganismo.sector)).filter(CaLicitacion.puntuacion_final >= umbral_minimo, CaLicitacion.ca_id.notin_(subq)).order_by(CaLicitacion.puntuacion_final.desc())
+            # 1. Subquery de exclusión (lo que ya gestionamos)
+            subq = select(CaSeguimiento.ca_id).where(
+                or_(
+                    CaSeguimiento.es_favorito == True, 
+                    CaSeguimiento.es_ofertada == True, 
+                    CaSeguimiento.es_oculta == True
+                )
+            )
+            
+            # 2. Query Principal con FILTRO DE ESTADO
+            stmt = select(CaLicitacion).options(
+                joinedload(CaLicitacion.seguimiento), 
+                joinedload(CaLicitacion.organismo).joinedload(CaOrganismo.sector)
+            ).filter(
+                # A. Filtro de Puntaje
+                CaLicitacion.puntuacion_final >= umbral_minimo, 
+                
+                # B. Filtro de "No Gestionadas"
+                CaLicitacion.ca_id.notin_(subq),
+                
+                # [cite_start]C. FILTRO NUEVO: Solo Publicadas (normal o 2do llamado) [cite: 121]
+                or_(
+                    CaLicitacion.estado_ca_texto == 'Publicada',
+                    CaLicitacion.estado_ca_texto == 'Publicada - Segundo llamado'
+                    # Nota: Si en el futuro aparecen variantes como "Publicada ", el ilike es mas seguro:
+                    # CaLicitacion.estado_ca_texto.ilike('%Publicada%')
+                )
+            ).order_by(CaLicitacion.puntuacion_final.desc())
+            
             return session.scalars(stmt).all()
 
     def obtener_datos_tab3_seguimiento(self) -> List[CaLicitacion]:
@@ -253,6 +332,12 @@ class DbService:
 
     # --- ACCIONES ---
 
+    def gestionar_favorito(self, ca_id: int, es_favorito: bool): 
+        self._gestionar_seguimiento(ca_id, es_favorito=es_favorito, es_ofertada=None)
+        
+    def gestionar_ofertada(self, ca_id: int, es_ofertada: bool): 
+        self._gestionar_seguimiento(ca_id, es_favorito=None, es_ofertada=es_ofertada)
+
     def _gestionar_seguimiento(self, ca_id: int, es_favorito: Optional[bool] = None, es_ofertada: Optional[bool] = None):
         with self.session_factory() as session:
             try:
@@ -266,9 +351,6 @@ class DbService:
                     session.add(nuevo)
                 session.commit()
             except Exception as e: logger.error(f"Error seguimiento {ca_id}: {e}"); session.rollback()
-
-    def gestionar_favorito(self, ca_id: int, es_favorito: bool): self._gestionar_seguimiento(ca_id, es_favorito=es_favorito, es_ofertada=None)
-    def gestionar_ofertada(self, ca_id: int, es_ofertada: bool): self._gestionar_seguimiento(ca_id, es_favorito=None, es_ofertada=es_ofertada)
 
     def gestionar_oculta(self, ca_id: int, ocultar: bool = True):
         with self.session_factory() as session:
