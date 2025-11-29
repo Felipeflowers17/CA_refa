@@ -1,0 +1,1433 @@
+﻿sector_id,nombre
+1,ADQUISICION MUNICIPAL
+2,IMUNI_ANTOFAGASTA Gestion.Secoplan
+3,SOCIAL
+4,SECCIÓN ABASTECIMIENTO
+5,Depto. de Finanzas
+6,Universidad de Talca
+7,Corporación Municipal Isla de Maipo
+8,DEPARTAMENTO DE EDUCACION
+9,Bienes y Servicios
+10,Dirección Regional de Valparaíso
+11,ADQUISICIONES
+12,UNIVERSIDAD ARTURO PRAT SEDE IQUIQUE
+13,Administracion Municipal
+14,Hospital San  José
+15,HOSPITAL DE MAULLÍN
+16,DELEGACION PRESIDENCIAL PROVINCIAL ISLA DE PASCUA
+17,Corporación para el desarrollo de la provincia de Osorno
+18,Daem
+19,Dirección de Vialidad - RM - Provincia de Talagante
+20,CMDS Nivel Central
+21,Departamento Provincial de Educación Norte
+22,Departamento De Salud Municipal
+23,HOSPITAL BARROS LUCO TRUDEAU
+24,Ilustre Municipalidad de Arauco - Educación
+25,ILUSTRE MUNICIPALIDAD TEODORO SCHMIDT
+26,DELEGACIÓN PRESIDENCIAL PROVINCIAL DE CHAÑARAL
+27,Universidad de Santiago de Chile
+28,Adquisiciones
+29,AREA EDUCACION
+30,Administración y Finanzas
+31,Departamento Finanzas
+32,Servicio Nacional de Geología y Minería
+33,Departamento de Adquisiciones
+34,SEREMI XV Región
+35,Compras y Licitaciones
+36,CORP CULTURAL BALMACEDA DOCE QUINCE
+37,Dpto Provincial de Curicó
+38,I MUNICIPALIDAD DE LA COMUNA DE EL BOSQUE
+39,Fondos No Afectos a Ley
+40,Municipalidad de Huechuraba
+41,EDUCACION
+42,VIII Región - Oficina Regional del Bio-Bio
+43,Programa de Desarrollo Logístico
+44,SUBSECRETARÍA DE LA NIÑEZ
+45,Dirección General de Aguas - VII Región
+46,VII  Región - Oficina Regional del Maule
+47,Fármacos
+48,FCFM Centro AMTC
+49,DEPARTAMENTO DE ADQUISICIONES
+50,Fondos Extrapresupuestarios
+51,Escuela de Suboficiales de Carabineros
+52,Hospital Dr. Eduardo Pereira Ramirez
+53,HOSPITAL CLAUDIO VICUNA
+54,DEPARTAMENTO DE ADQUISICIONES MUNICIPALES.-
+55,Regional Lib Bdo Ohiggins
+56,CEMENTERIO MUNICIPAL
+57,Administración y finanzas
+58,Departamento de Educación
+59,DEPARTAMENTO DE SALUD MUNICIPAL
+60,Dirección General de Aguas - XV Región de Arica
+61,FR TARAPACA
+62,Dirección de Desarrollo Comunitario
+63,P02 Establecimientos Educacionales
+64,Hospital HGGB Operaciones
+65,JENACRIM
+66,ILUSTRE MUNICIPALIDAD DE MELIPILLA
+67,Subsecretaría del Deporte
+68,Corporación Municipal de la Florida
+69,Seremi de Salud I Región
+70,CFTE del BioBio
+71,VAEC DIRBDE Proyectos
+72,Departamento Provincial Concepción
+73,Universidad de Aysen
+74,I MUNICIPALIDAD DE ANTOFAGASTA - FINANZAS
+75,SLEP Del Pino 02
+76,DIRECCION DE SALUD
+77,GOBERNACION MARITIMA DE CASTRO
+78,Ministerio del Interior - Subsecretaría de Desarrollo Regional
+79,Finanzas
+80,Depto. Adquisiciones
+81,Subsecretaría de Agricultura
+82,SUBSECRETARIA DE SEGURIDAD PUBLICA
+83,DIDECO
+84,I MUNICIPALIDAD DE TALAGANTE
+85,I MUNICIPALIDAD DE LAS CONDES
+86,Departamento Provincial Valparaíso-Isla de Pascua
+87,UNIDAD NORMAL
+88,I. MUNI  MAIPU  DEPARTAMENTO DE ADQUISICIONES
+89,Hospital de Urgencia Asistencia Pública
+90,Fiscalía Nacional
+91,HOSPITAL DE LLANQUIHUE
+92,SERVICIOS GENERALES
+93,SAG - Araucanía
+94,Departamento de Administración
+95,Centro de Entrenamiento de Combate Acorazado
+96,12 - Región de Magallanes y Antartica Chilena
+97,Dirección General de Aguas - XI Región
+98,COMPRAS Y LICITACIONES
+99,FACULTAD DE CIENCIAS SOCIALES
+100,Fiscalización y Control
+101,Corporación Cultural de Antofagasta
+102,SECCIÓN COMPRAS ZONA DE CARABINEROS ÑUBLE
+103,Subsecretaría de Telecomunicaciones
+104,UNIDAD DE FINANZAS
+105,FCFM Departamento de Ingeniería Civil
+106,Servicio Nacional del Consumidor
+107,I.N.D. REGION VI
+108,CSNCCL
+109,SERVICIO LOCAL DE EDUCACIÓN PÚBLICA DE ANDALIÉN CO
+110,INSUMOS CLINICOS
+111,Universidad del Bío-Bío - Campus Concepción
+112,DEPARTAMENTO FRONTERAS OS3
+113,Departamento  Provincial  Educación  Cautín Sur
+114,Municipalidad de Los Muermos-Adquisiciones
+115,CAMPUS CORDILLERA
+116,UCHILE  Facultad Medicina (5178)
+117,Adquisiciones Municipalidad
+118,IMUNI_COQUIMBO
+119,Hospital de Loncoche
+120,P02 SEP ATACAMA
+121,ILUSTRE MUNICIPALIDAD DE COLCHANE
+122,PIB - COORDINACION NACIONAL
+123,Servicio de Salud del Maule
+124,DIRECCIÓN REGIONAL DE LA ARAUCANÍA
+125,SECPLAN
+126,Dirección  de Salud Municipal Chillán
+127,Instituto Nacional de Hidráulicas - INH
+128,Departamento Provincial Choapa
+129,Hospital Clínico Univ. de Chile - Unidad de Medicamentos
+130,ADMINISTRACION DE SS PP
+131,Departamento Provincial de Educación Oriente
+132,Depto. Adquisiciones Municipales
+133,Departamento Provincial de Educación Cordillera
+134,Direccion Admin. Salud Municipal Florida
+135,Dirección de Salud Municipal
+136,Facultad de Medicina
+137,Servicio Local de Educación Pública Licancabur
+138,ADMINISTRACIÓN DE CAMPUS
+139,UCHILE -FACULTAD DE DERECHO
+140,Departamento Educación
+141,CORPORACION DE DESARROLLO TERRITORIAL Y TURISMO DE LA REGION METROPOLI
+142,SUBSECRETARIA DE SERVICIOS SOCIALES
+143,Hospital de Nancagua
+144,Fármarcos
+145,JUNTA DE ALCALDES PROVIDENCIA LAS CONDES LA REINA
+146,Municipio
+147,I MUNICIPALIDAD DE PORTEZUELO
+148,IV Región - Provincial Choapa
+149,ADMINISTRACIÓN DE FONDOS DE TERCEROS
+150,PROYECTOS CON TERCEROS (D/583)
+151,IPS Region de Tarapaca
+152,Mantención HR Coyhaique
+153,Municipalidad de Yumbel
+154,Educación
+155,FAC.CS.QUIMICAS DIRECAD
+156,Depto. Educación
+157,Salud
+158,FF ALMIRANTE CONDELL
+159,UNIDAD ADQUISICIONES MUNICIPAL VALDIVIA
+160,UCHILE Instituto de Estudios Internacionales
+161,Tesorería Provincial de Illapel
+162,IMUNI_OSORNO DEPTO EDUCACION
+163,Hospital Clínico Univ. de Chile - Insumos Clínicos
+164,DEPARTAMENTO CONTROL FINANCIERO
+165,MUNICIPALIDAD DE CARTAGENA-ADQUISICIONES
+166,DIRECCION ADMINISTRATIVA MUNICIPALIDAD DE CONCEPCIÓN
+167,Hospital San Camilo de San Felipe
+168,I MUNICIPALIDAD DE PUENTE ALTO
+169,Ilustre Municipalidad de Longaví- Educación
+170,CORPORACION MUNICIPAL VINA DEL MAR PARA EL DESARRO
+171,CET Cerrado CCP Linares
+172,Hospital Lebu
+173,Activos Fijos
+174,BIBLIOTECA DE SANTIAGO
+175,MUNICIPAL
+176,Centro de Formación Técnica Región de Coquimbo
+177,X Puerto Montt DR
+178,IMUNI_SAN JAVIER DEPTO. ADQUISICIONES
+179,Escuela de Formación Policial de Carabineros
+180,Dirección de Educación
+181,Comité de Des. Productivo Regional del Bío Bío
+182,Región de Coquimbo
+183,SERVICIO EDUCATIVO ANDALIEN COSTA
+184,FINANZAS IMA
+185,Instituto Forestal
+186,Administracion y Finanzas
+187,SECCIÓN COMPRAS ZONA DE CARABINEROS ANTOFAGASTA
+188,SUPEREDUC DIRECCION REGIONAL II
+189,I.MUNICIPALIDAD DE CONCON
+190,Unidad de Salud
+191,DEPARTAMENTO DE ABASTECIMIENTO
+192,Regional Ñuble
+193,GOBERNACION MARITIMA DE PUERTO MONTT
+194,Dirección de Salud
+195,Insumos Hospital de Copiapó
+196,ODEL
+197,Departamento de Salud Municipal
+198,FCFM Escuela de Ingeniería y Ciencias
+199,FCFM Servicio Facultad
+200,SECCIÓN COMPRAS ZONA DE CARABINEROS TARAPACA
+201,DIRECCION DE ADMINISTRACION Y FINANZAS
+202,MUNICIPALIDAD DE LOS ANGELES - EDUCACION
+203,Centro de Asuntos Antárticos del Ejército - CAAE
+204,DPTO. MUNICIPALIDAD
+205,Departamento de Adquisiciones San Ramon
+206,Biblioteca del Congreso Nacional
+207,Mineduc Administración VI Región
+208,CDSP
+209,ADMINISTRACIÓN COMPLEJO FRONTERIZO CHACALLUTA
+210,CORPORACION CULTURAL SOCIAL Y DEPORTIVA MUNICIPAL DE QUILICURA
+211,Región Metropolitana
+212,SERVICIO MUNICIPAL DE SALUD
+213,CORMUN RANCAGUA - ADMINISTRACIÓN CENTRAL
+214,FCFM Campus Facultad
+215,Agencia de Promoción de la Inversión Extranjera
+216,SERVICIO LOCAL DE EDUCACION PUBLICA DE LLANQUIHUE
+217,SECCIÓN COMPRAS ZONA DE CARABINEROS COQUIMBO
+218,Educacion Municipal
+219,Dep. Gestion Medioambiente y Servic
+220,DEPARTAMENTO DE SALUD
+221,Dirección de Vialidad - IX Región - Provincia de Malleco
+222,Municipalidad de Frutillar Depto. Adm. Salud
+223,UCHILE Vicerrectoría de Extensión
+224,Municipalidad de Maule
+225,Dirección Regional del Trabajo del Ñuble
+226,DIRECCION DE ASEO Y ORNATO
+227,Hospital de Castro
+228,Subdirección de administración y finanzas
+229,FINANZAS
+230,DEPTO DE SALUD MUNICIPAL
+231,FR COQUIMBO
+232,PROGRAMA 01
+233,DIAFI
+234,DEPARTAMENTO DE ADMINISTRACION
+235,Ilustre Municipalidad de San Rosendo
+236,ADQUISICIONES MUNICIPAL
+237,Facultad de Administración y Economía
+238,Departamento de Administración y Finanzas
+239,SERVIU II Región
+240,X Región - Oficina Regional de Los Lagos
+241,Ilustre Tercer Tribunal Ambiental
+242,SALUD
+243,Hospital Quintero
+244,Dirección de Administración y Finanzas
+245,IMUNI_QUILLOTA ADQUISICIONES
+246,DEPARTAMENTO DE EDUCACION MUNICIPAL
+247,Administración Municipal
+248,SUPEREDUC DIRECCION REGIONAL XII
+249,Compra Agil - Coord Administración y Finanzas
+250,Departamento Provincial Iquique
+251,Instituto Alta Investigacion
+252,Servicio Local de Educación Pública Aysén
+253,Mineduc Administración RM
+254,MUNICIPALIDAD LIMACHE - Adquisiciones
+255,ÁREA EDUCACIÓN
+256,ILUSTRE MINICIPALIDAD DE COMBARBALA
+257,Departamento de Finanzas
+258,Municipalidad de Ovalle - imoadq
+259,Secpla
+260,SALUD MARCHIGUE
+261,Conaf - Oficina Central - Abastecimiento
+262,Hospital Teno
+263,GOBERNACION MARITIMA DE PUNTA ARENAS
+264,Municipalidad de San Miguel-Dirección de Administración y Finanzas-Adquisiciones
+265,I MUNICIPALIDAD DE TEMUCO
+266,Dirección de Tecnología
+267,Adquisiciones Salud
+268,Unidad De Adquisiciones
+269,Ilustre Municipalidad de Lonquimay
+270,DEPARTAMENTO COMPRAS PÚBLICAS
+271,22 Organismo Central-Vic de Investigación e Innova
+272,UCHILE FAC.ARTES Adquisiciones
+273,Area Municipal
+274,Departamento De Educacion
+275,Educacion
+276,Finanzas  Municipalidad de Arauco
+277,Región de Los Lagos
+278,DIRECCIÓN DE GESTIÓN ESTRATÉGICA INSTITUCIONAL
+279,Abastecimiento
+280,XI Región - Oficina Provincial Aysen
+281,UCHILE CEAC
+282,Municipalidad
+283,I MUNICIPALIDAD DE SANTA MARIA
+284,ADMINISTRACIÓN
+285,FCFM Departamento de Ingeniería en Minas
+286,Depto. De Salud
+287,Gobierno Regional de la Región del Bío Bío
+288,Dirección Región Metropolitana XIII
+289,Ilustre Municipalidad de Yerbas Buenas
+290,IMUNI_OSORNO DEPTO  SALUD
+291,HOSPITAL ORIENTE DR LUIS TISNE BROUSSE
+292,Ilustre Municipalidad de Penco
+293,Corporación Municipal de Educación de Talagante
+294,Hospital Cochrane
+295,DAEM
+296,Extrapresupuestaria - CET Cerrado CCP Talca
+297,ASOCIACION CULTURAL MUNICIPAL DE CERRILLOS
+298,Región de Aysén
+299,Hospital Doctor  Leopoldo Ortega Rodríguez
+300,Laboratorio de Gobierno
+301,DIRECCIÓN REGIONAL DE ANTOFAGASTA
+302,Superintendencia del Medio Ambiente -Nivel Central
+303,DEPTO. DE BIENESTAR SOCIAL (V)
+304,DEPARTAMENTO ADMINISTRACION SALUD MUNICIPAL
+305,Junji - IX Región
+306,Escuela de Formación Carabineros Grupo Valdivia
+307,Dirección de Salud Rural
+308,Ilustre Municipalidad de Ranquil
+309,Operaciones
+310,Depto. Educacion Municipal
+311,Direccion Regional de Los Rios
+312,DEPARTAMENTO DE COORDINACIÓN INSTITUCIONAL - DCI
+313,Municipalidad de Papudo - Dpto. Adquisiciones
+314,UNIDAD DIDECO
+315,DEPT. EDUCACION COMUNAL
+316,Dirección Nacional
+317,Universidad Arturo Prat Sede Victoria
+318,Hospital Dr. Möll de Cabildo
+319,Consejo Regional de Cultura Región de Aysen
+320,DIDECO MUNICIPALIDAD DE CONCEPCION
+321,Cuerpo Militar del Trabajo Subjefatura Zonal Punta Arenas
+322,Abastecimiento y Farmacia
+323,MINISTERIO DE LA MUJER Y LA EQUIDAD DE GÉNERO
+324,FEN - DECANATO
+325,CORPORACION MUNICIPAL DE DEPORTES DE RANCAGUA
+326,Nivel Central SBAP
+327,Secoplac
+328,Hospital Galvarino
+329,DEPTO SALUD
+330,Depto. de Educación
+331,Departamento de Salud
+332,Depto. Salud
+333,Ilustre Municipalidad De Florida
+334,DEPARTAMENTO DE FINANZAS
+335,MUNICIPALIDAD DE TRAIGUEN
+336,Ministerio de justicia - Subsecretaría de Justicia
+337,UCHILE Programa de Bachillerato
+338,Junaeb Región Antofagasta
+339,Direccion De Educacion
+340,Equipamiento y Accesorios
+341,FAC. ARQUITECTURA Dirección Econ. y Admin.
+342,Departamento de adquisiciones y abastecimiento
+343,"FONASA, Nivel Central"
+344,Hospital de San Fernando Abastecimiento
+345,RED SECUNDARIA Y PEQUEÑOS AD Z NORTE
+346,ADMINISTRACIÓN Y FINANZAS
+347,Ilustre Municipalidad de Rio Verde
+348,Universidad de Antofagasta
+349,Cesfam Segismundo Iturra Taito
+350,Hospital Dr. Augusto Essmann Burgos
+351,Municipalidad de Papudo - Educación
+352,Región de Atacama
+353,Servicio Nacional del Adulto Mayor
+354,Proyecto La Cisterna
+355,Ilustre Municipalidad de Coyhaique
+356,Corp. Adm. del Poder Judicial - Chillán
+357,DEM
+358,I MUNICIPALIDAD DE PERALILLO
+359,Hospital San Martín de Quillota
+360,Hospital Dr. Ernesto Torres Galdames
+361,Corp. Adm. del Poder Judicial - Rancagua
+362,DEPTO. ADQUISICIONES MUNICIPIO
+363,Ilustre Municipalidad de Negrete
+364,Escuela de Carabineros
+365,Dirección General de Aguas - XIV Región de los Rios
+366,I.N.D. REGION XI
+367,CRS de Peñalolen Cordillera Oriente
+368,14 Convenio Desempeño - Proyectos
+369,DPTO. DE SALUD MUNICIPAL DE VALDIVIA
+370,Abastecimiento Hospital de Copiapó
+371,Economato CDP Puente Alto
+372,DELEGACION DE BIENESTAR PUERTO WILLIAMS
+373,DIRECCION MEDIO AMBIENTE
+374,"medicamentos, oxigeno y trauma"
+375,Hospital Coinco
+376,FARMACIA
+377,Programa de Vialidad y Transporte Urbano - Sectra
+378,Universidad del Bío-Bío - Campus Chillán
+379,FACULTAD DE INGENIERIA (1)
+380,DIRECCION DESARROLLO COMUNITARIO
+381,ILUSTRE MUNICIPALIDAD DE CASTRO
+382,Junji - III Región
+383,SECCIÓN COMPRAS ZONA DE CARABINEROS VALPARAISO
+384,DEPTO KINESIOLOGIA
+385,DEPTO. EDUCACIÓN
+386,Adquisiciones y Mantención
+387,Depto. Educacion
+388,Servicio Dental
+389,Ilustre Municipalidad de Quilleco
+390,CORP CULTURAL Y TURISMO DE CALAMA
+391,DEPARTAMENTO ADMINISTRACION Y FINANZAS
+392,I MUNICIPALIDAD DE VILLARRICA
+393,CAMPUS OSORNO
+394,ADQUISICIONES MUNISANFE
+395,FACULTAD DE EDUCACION Y HUMANIDADES
+396,Cuerpo Milit Subjefatura Zonal Punta Arenas (IGTF)
+397,UNIDAD DE COMPRA IQUIQUE
+398,ORASMI
+399,Junji - X Región
+400,Casa Central
+401,I MUNICIPALIDAD DE VINA DEL MAR
+402,Depto. Educación Maule
+403,FR ARAUCANIA
+404,Regional Aysen
+405,CORPCOLINA SALUD
+406,I MUNICIPALIDAD DE PEMUCO
+407,Salud Municipal
+408,Servicio de Salud del Reloncaví
+409,I MUNICIPALIDAD DE SAAVEDRA
+410,Hospital Villarrica
+411,Consejo Regional de la Cultura y las ArtesCoquimbo
+412,DELEGACION PRESIDENCIAL REGIONAL DE AYSEN
+413,SECCIÓN COMPRAS ZONA DE CARABINEROS ARAUCANIA
+414,Dirección Regional Metropolitana
+415,Oficina de Adquisiciones Municipales
+416,FF ALMIRANTE COCHRANE
+417,"Dirección Regional de Arquitectura, Región XIV de Los Rios"
+418,HOSPITAL COMPLEJO ASISTENCIAL PADRE LAS CASAS
+419,MUNICIPALIDAD DE CHIGUAYANTE
+420,Dirección Regional IV Región
+421,DIRECCION INFRAESTRUCTURA
+422,Departamento Administración y Finanzas I.M.M.E.
+423,BIENES Y SERVICIOS
+424,Unidad de Adquisiciones
+425,Municipalidad de Pica
+426,SENCE XV REGION
+427,Tesorería Regional Concepción
+428,ADMINISTRACIÓN DIRECTA REGIÓN DEL MAULE
+429,Departamento De Salud
+430,DIRECCION DE ASUNTOS ESTUDIANTILES
+431,MUNICIPALIDAD DE PIRQUE - SECPLA
+432,UCHILE INTA
+433,Delegación Presidencial Provincial del Ranco
+434,APROVISIONAMIENTO
+435,Ministerio del Interior
+436,Servicio de Salud Chiloé
+437,UNIVERSIDAD DE O'HIGGINS
+438,I. MUNICIPALIDAD DE SAN NICOLAS - EDUCACIÓN
+439,Centro de Control y Certificación Vehicular - MTT
+440,Municipalidad de Curicó - Educación - Adquisiciones
+441,Departamento Provincial Bío Bío
+442,Servicio Municipal de Salud - Convenios
+443,"SUBSECRETARIA DE CIENCIA, TECNOLOGIA, CONOCIMIENTO E INNOVACION"
+444,Agencia Chilena de Eficiencia Energética
+445,CET Cerrado CDP Talagante
+446,ILUSTRE MUNICIPALIDAD DE QUINTA NORMAL
+447,Hospital de Quellón
+448,Hospital Parral
+449,SERVICIO DE SALUD ARAUCO
+450,JEFATURA NACIONAL DE EDUCACIÓN Y DOCTRINA (JENAED)
+451,Dirección  Adm. y  Finanzas
+452,U. ADQUISICIONES  CENTRO SALUD Y REHABILITACION
+453,IMUNI_POZOALMONTE  ADQUISICIONES
+454,IVª Brigada Aérea
+455,SECCIÓN COMPRAS
+456,SEREMI  de la Cultura  las Artes patrimon Tarapacá
+457,I. Municipalidad de Malloa - Departamento de Educación
+458,Defensoría Nacional
+459,FARMACIA INSUMOS
+460,Hospital Los Vilos
+461,Departamento de Educacion Municipal
+462,SUPEREDUC DIRECCION REGIONAL IX
+463,DAF
+464,Servicios Generales
+465,Proyectos
+466,"Regimiento Logístico N° 3 ""Victoria"""
+467,I MUNICIPALIDAD DE SANTO DOMINGO
+468,ID 3949 - CESFAM Dr Alejandro Gutiérrez
+469,DIRECCIÓN DE SERVICIOS Y  LOGÍSTICA
+470,Regional Valparaiso
+471,Escuela Formación Carabineros Grupo Concepción
+472,Sección de Abastecimiento y Proyectos
+473,CORPORACION CULTURAL DE LA ILUSTRE MUNICIPALIDAD DE VALDIVIA
+474,Servicio de Salud Ohiggins
+475,Dpto. Salud
+476,Municipalidad de Ancud
+477,Municipalidad De Nogales
+478,UNIDAD DE COMPRA INSUMOS  Y OTROS
+479,ALA BASE N°1
+480,Abastecimiento Insumos
+481,Hospital Dr. Abraham Godoy Peña
+482,Adquisiciones Hospital Regional Coyhaique
+483,Insumos Clínicos
+484,Ministerio del Interior - Delegación Reg  Coquimbo
+485,Departamento Salud
+486,I.MUNICIPALIDAD AYSEN-ADQUISICIONES
+487,FACULTAD DE CIENCIAS AGRONOMICAS
+488,UNIDAD TÉCNICA DIRECCIÓN DE EDUCACIÓN
+489,Comisión Administradora del Sistema de Créditos pa
+490,REGIONAL METROPOLITANO
+491,Universidad de la Frontera
+492,"Finanzas, Adquisiciones"
+493,DIRECCION
+494,Tesorería  Regional Santiago Oriente
+495,División de Bienestar - Cuartel General
+496,Departamento de educacion
+497,Servicios Internos (2268)
+498,SUBSECRETARIA DEL MINISTERIO DE MINERIA
+499,CENTRO DE FORMACION TECNICA DE LA REGION METROPOLI
+500,SEREMI del Maule
+501,SII DR18 Dirección Regional Arica
+502,ADQUISICION MUNI-EDUCACION
+503,I MUNICIPALIDAD DE SAN NICOLAS
+504,Depto.Adquis y Abast.L2
+505,Compra Regional
+506,SERVICIO SALUD ARAUCANIA HOSPITAL DE COLLIPULLI
+507,Jefatura Ejecutiva de Administración de los Fondos de Salud
+508,Área de servicios generales y Adquisiciones
+509,XI Región - Provincial Capitán Prat
+510,HOSPITAL NAVAL ALMIRANTE ADRIAZOLA
+511,Ilustre Municipalidad de Arauco - Salud
+512,Mineduc Administración II Región
+513,DIRECCION DE EDUCACION
+514,DIRECCION DE SALUD MUNICIPAL DE CONCEPCION
+515,Adquisiciones - I Municipalidad de Quemchi
+516,Hospital de Mejillones
+517,SECCIÓN COMPRAS ZONA SANTIAGO OESTE
+518,Junaeb Región de Coquimbo
+519,Bienestar Social III Brigada Aerea
+520,DIRECCIÓN DE VINCULACIÓN CON EL MEDIO
+521,DIRECCION  DE COMPRAS PUBLICAS
+522,ILUSTRE MUNICIPALIDAD DE LINARES
+523,Unidad de Compras Municipal
+524,S. GENERALES HSJAVIER
+525,Seremi Ñuble
+526,COMPLEJO ASISTENCIAL DR. SOTERO DEL RIO
+527,Cuerpo Militar del Trabajo Subjefatura Zonal Arica
+528,Depto. de Secplan
+529,MUNICIPALIDAD DE PADRE LAS CASAS
+530,DELEGACIÓN PRESIDENCIAL REGIONAL DEL LIBERTADOR BE
+531,Destacamento Montaña Nº 9 Arauco - DESMÑA N° 9
+532,UCHILE Fac. de Ciencias
+533,Departamento Adquisiciones
+534,DEPTO.  ADMINISTRATIVO
+535,ÁREA DE SALUD
+536,FCFM IDIEM
+537,Dirección Comunal de Salud
+538,Economato CPF San Miguel
+539,UCHILE Liceo Experimental Manuel de Salas
+540,CIP CRC Limache
+541,HOSPITAL DOCTOR HERNAN HENRIQUEZ ARAVENA
+542,SERVICIO DE SALUD DE ARICA
+543,SECCIÓN COMPRAS ZONA DE CARABINEROS DE LOS RIOS
+544,INE -  X Región
+545,Municipalidad de Hualpén
+546,SERVICIO DE SALUD VALPARAISO SAN ANTONIO
+547,CORPORACION MUNICIPAL DE CULTURA DE TALCA
+548,Hospital de San Vicente de Tagua Tagua
+549,GOBERNACION MARITIMA DE SAN ANTONIO
+550,DIRECCION DE SALUD MUNICIPAL
+551,Departamento de  Salud
+552,MUNICIPALIDAD DE ALGARROBO-ADQUISICIONES
+553,MN PROMOCION DE EXPORTACIONES
+554,Dirección General de Aguas - XVI Región de Ñuble
+555,Dirección Regional Aduana Metropolitana
+556,UNIDAD DE COMPRAS
+557,Regional Tarapaca
+558,UNIDAD DE COMPRA ATACAMA
+559,Región del Bio Bío
+560,IIª Brigada Aérea
+561,OFICINA DE ADQUISICIONES
+562,Hospital de Achao
+563,Abastecimiento Fármacos
+564,Servicio de Salud Metropolitano Occidente
+565,Escuela de Gendarmería
+566,Ministerio de Hacienda - Dipres
+567,Región de Magallanes
+568,PROGRAMAS SERNAMEG-DPPO
+569,Direccion de Administracion y Finanzas
+570,Dirección de Arquitectura - XII Región
+571,I. MUNICIPALIDAD DE QUILPUE
+572,División de Bienestar Social
+573,Departamento de Licitaciones y gestión de Abastecimiento
+574,Direccion De Salud
+575,Hospital de Curepto
+576,I MUNICIPALIDAD DE LAS GUAITECAS
+577,Departamento Adm. Y Finanzas
+578,ADMINISTRACIÓN DIRECTA REGIÓN DE VALPARAÍSO
+579,CORPORACION DEL DEPORTE DE PICHIDEGUA
+580,Hospital Curanilahue
+581,DEPTO. ADM. Y FINANZAS
+582,Oficina de Adquisiciones del Departamento de Salud
+583,CUENTA FISCAL
+584,DIRECCION DE ADMINISTRACION DE SALUD
+585,Mineduc Administración XIV Región
+586,Bienes y Servicio
+587,Corporación Municipal de San Miguel
+588,Liceo Enrique Ballacey
+589,ADQUISICION MUNI-SALUD
+590,Jdo de Garantia de Limache
+591,PMU y PROEMPLEO
+592,BIENESTAR EXTRAPRESUPUESTARIA
+593,PRODER
+594,Depto. Provincial Educación Chiloe
+595,SEREMI VII Región
+596,SEREMI de Tarapacá
+597,ABASTECIMIENTO
+598,Extrapresupuestaria-CET Osorno
+599,CESFAM JUAN LOZIC PEREZ
+600,DISAM
+601,CORPORACION CULTURAL ESTACION CENTRAL
+602,VI - Oficina Regional y Prov. Cachapoal
+603,Servicio Local de Educación Pública Magallanes
+604,Servicio de Salud Aconcagua
+605,SENDA-DIRECCIÓN REGIONAL LOS LAGOS
+606,"Brigada Motorizada N° 1 ""Calama"" - BRIMOT N 1"
+607,Departamento Provincial Elqui
+608,I MUNICIPALIDAD DE CURANILAHUE
+609,Bienestar Social y Calidad de Vida
+610,Área Salud
+611,CORPORACION CULTURAL DE LO BARNECHEA
+612,I MUNICIPALIDAD DE LONCOCHE
+613,Seremi Region Metropolitana
+614,Hospital Clínico Univ. de Chile-Insumos Generales
+615,Insumos y Reactivos
+616,Ilustre Municipalidad de Tortel
+617,IFOP
+618,Secplan
+619,SECCIÓN COMPRAS ZONA DE CARABINEROS MAULE
+620,I MUNICIPALIDAD DE OLIVAR
+621,SERVICIO DE SALUD ANTOFAGASTA DIRECCION
+622,"Regimiento Logístico N° 1 ""Tocopilla"""
+623,Depto.Relaciones Públicas
+624,INSTITUTO NACIONAL DEL TORAX
+625,Municipalidad de Los Muermos-Depto. Salud
+626,Cuerpo Militar del Trabajo Subjef Zonal Pto. Montt
+627,I MUNICIPALIDAD DE CABILDO
+628,Bienestar Social I Brigada Aerea
+629,Municipalidad de Máfil - Adquisiciones
+630,Administración de Fondos de Terceros
+631,Servicio Aerofotogramétrico
+632,FR MAULE
+633,SERVICIO DE SALUD OCCIDENTE HOSPITAL SAN JUAN DE D
+634,Región de Valparaíso
+635,Direccion Administracion y Finanzas
+636,RED SECUNDARIA Y PEQUEÑOS AD Z AUSTRAL
+637,Dirección de Vialidad - IX Región - Provincia de Cautín
+638,DEPARTAMENTO DE EDUCACIÓN
+639,SECCIÓN COMPRA ZONA DE CARABINEROS AYSÉN
+640,Secretaría Ministerial de Educación Arica y Parinacota
+641,Economatos-Región de los Ríos
+642,IMUNI_CURICOADQUISICIONES
+643,Municipalidad de San Gregorio - Adquisiciones
+644,IMUNI_ESTCENTRAL ADQUISICIONES
+645,HOSPITAL DE PEÑABLANCA
+646,Junji - IV Región
+647,Programa de Atencion a Victimas
+648,REPUBLICA FEDERAL ALEMANIA
+649,Dirección de Vialidad - IV Región - Provincia de Elqui
+650,Hospital Juan Noé
+651,03 - Región de Atacama
+652,DELEGACIÓN PRESIDENCIAL REGIONAL DE TARAPACÁ
+653,DIRECCION DE EDUCACION DE LA ARMADA
+654,DPTO DE COORDINACION INSTITUCIONAL - PRORRECTORIA
+655,Municipalidad de Ovalle - Educación
+656,Departamento de Mantención
+657,Exámenes
+658,Centro Referencia Salud Doctor Salvador Allende G.
+659,I MUNICIPALIDAD DE PLACILLA
+660,DPTO. ADQUISICIONES
+661,CORPORACION MUNICIPAL DE PENALOLEN PARA EL DESARRO
+662,corpocas
+663,H Puerto Aysén
+664,Dirección de Adm. y Finanzas
+665,I MUNICIPALIDAD DE MOSTAZAL
+666,Unidad de Adquisiciones Dirección de Educación
+667,SLEP Gabriela Mistral  P02
+668,SAG - Maule
+669,1° Jdo de Letras del Trabajo de Santiago
+670,DEPARTAMENTO ADQUISICIONES MUNICIPAL
+671,UCHILE Facultad de Cs. Forestales
+672,Hospital Carlos Cisternas de Calama
+673,Departamento Finanzas - D.A.F
+674,Adquisicion Municipal
+675,Liceo Comercial Armando Bravo Bravo
+676,Hospital Gorbea
+677,Hospital de Huasco
+678,Regimiento de Caballería Nº 3 Húsares - RC Nº 3
+679,I MUNICIPALIDAD DE TALTAL
+680,IV Región - Oficina Regional de Coquimbo
+681,04 Facultad de Medicina
+682,Junaeb Región de Los Lagos
+683,Instituto de Investigaciones y Control - IDIC
+684,I MUNICIPALIDAD DE PARRAL
+685,Departamento de Educación Municipal
+686,Finanzas Municipales
+687,DIRECCION REGIONAL MAULE
+688,SECCIÓN COMPRAS ZONA CARAB DE ARICA Y PARINACOTA
+689,DEPTO. DE EDUCACION
+690,Hospital de Illapel
+691,UNIDAD DE COMPRAS - P02
+692,FCFM-PROYECTO FONDAP GEOTERMIA
+693,MOP Dirección General de Concesiones
+694,Contraloría General de la República
+695,Junji - XV Región - Arica
+696,Gobierno Regional de Valparaiso - V Región
+697,Departamento de Salud Parral
+698,DELEGACIÓN PRESIDENCIAL PROVINCIAL DEL BIOBÍO
+699,"FCFM Depto Ing Química, Biotecnología y Materiales"
+700,ILUSTRE MUNICIPALIDAD DE LLANQUIHUE-DEPTO. DE SALUD
+701,Departamento Adm. Educacional Municipal
+702,SEREMI MINVU I REGION
+703,Dideco
+704,Hospital de Curacaví
+705,Hospital de Lolol
+706,MUNICIPALIDAD DE CORRAL
+707,INFORMATICA MUNICIPALIDAD DE CONCEPCION
+708,I MUNICIPALIDAD DE COCHRANE
+709,SEREMI LIBERTADOR GRAL. BERNARDO O'HIGGINS
+710,ESTACION NAVAL METROPOLITANA
+711,OBRAS
+712,FISCALIA LOS LAGOS
+713,Bienestar
+714,Mineduc Administración XII Región
+715,SUBSECRETARÍA DE TRANSPORTES
+716,Instituto Nacional de la Juventud - MIDESO
+717,Unidad de Compra - Region de los Rios
+718,Subdirección de Atención Primaria
+719,Municipalidad de Temuco-Salud
+720,Consejo Regional de la Cultura y Las Artes Antofagasta
+721,Adquisiciones Clinicas Medicamentos e Insumos
+722,Región de Ñuble
+723,Dirección de Arquitectura - III Región
+724,IM De El Monte - Adquisiciones
+725,Compra Agil - DAG
+726,DIRECCIÓN DE ADMINISTRACIÓN Y FINANZAS
+727,SERVICIO LOCAL DE EDUCACION DE PUERTO CORDILLERA
+728,Subsecretaría de Salud Pública
+729,Direccion de Seguridad Pública
+730,Abastecimiento Hospital Limache
+731,Consejo Nacional de Educación
+732,DELEGACIÓN PRESIDENCIAL PROVINCIAL DE ARAUCO
+733,TOP de Linares
+734,Subsecretaria de Pesca 2
+735,SERVIU X REGION
+736,Serv. de Gobierno Interior - Nivel Central
+737,Abastecimiento General
+738,XV Región - Oficina Regional Arica y Parinacota
+739,Consultorio Rio Negro Hornopiren
+740,Comisión Chilena de Energía Nuclear
+741,SENDA NACIONAL
+742,Hospital Dr. Gustavo Fricke
+743,VAA Departamento de Pregrado
+744,Municipalidad de Santa Barbara
+745,Extrapresupuestaria-CET San Carlos
+746,Ilustre Municipalidad de Villa Alegre
+747,Inst Nacional del Cancer Adquisiciones
+748,Corporación de Educación y Salud de Las Condes
+749,DEFENSA CIVIL DE CHILE
+750,Farmacia Hospital de Copiapo
+751,UNIDAD DE ADQUISICIONES
+752,DIDECO Y OTROS
+753,Escuela de Artillería - ESCART
+754,SERVICIO LOCAL DE EDUCACION PÚBLICA DE ATACAMA
+755,13 Campus - San Felipe
+756,MUNICIPALIDAD DE PADRE LAS CASAS  SALUD
+757,Corporación
+758,SAG - Región Metropolitana
+759,Dirección General de Aguas - V Región
+760,Región de Antofagasta
+761,POLÍCLINICO MÉDICO - DENTAL DE PUERTO MONTT
+762,Hospital de Talagante
+763,DEPTO. DE FINANZAS
+764,COMPRAS Y CONTRATACIONES MUNICIPALES
+765,Región de O'Higgins
+766,Proyecto ING2530001 DECANAT FACULTAD DE INGENIERÍA
+767,UCHILE Facultad Cs.Veterinarias
+768,LOGISTICA PTO. MONTT
+769,Ilustre Municipalidad de El Carmen
+770,Fondos Hospitales
+771,Capacitación
+772,DIRECCIÓN REGIONAL DE COQUIMBO
+773,DEPTO DE BIENESTAR SOCIAL PUERTO MONTT
+774,INSTITUTO ANTARTICO CHILENO
+775,ADMINISTRACIÓN CENTRAL CMQ
+776,Insumos Generales
+777,Abastecimiento Principal
+778,Ilustre Municipalidad de Requínoa
+779,Ayudas Técnicas
+780,DIRECCIÓN REGIONAL DE LA ARAUCANIA
+781,CENTRO DE SALUD FAMILIAR PUERTO AYSÉN
+782,XIV región - Oficina Regional de Los Rios
+783,Base Aérea El Bosque
+784,SERVICIOS TRASPASADOS DEPARTAMENTO DE SALUD
+785,Mineduc  Administración X Región
+786,Secretaría Municipal
+787,HOSPITAL DE QUILPUE
+788,ATF 65 Janequeo
+789,Consultorio Victor Domingo Silva
+790,BASE NAVAL PUERTO MONTT
+791,SERVICIO SALUD ARAUCANIA NORTE HOSPITAL CURACAUTIN
+792,Departamento Adquisiciones MN
+793,MUNICIPALIDAD DE CARTAGENA-SALUD
+794,MOP Subsecretaría
+795,Seremi de Salud VIII región
+796,RECTORIA - PROGRAMA TRANSVERSAL DE EDUCACION
+797,Corp. de Asistencia Judicial Región del Bío-Bío
+798,Municipalidad De Ninhue-Educacion
+799,Departamento Provincial Limari
+800,Extrapresupuestaria - CET Cerrado CCP Coyhaique
+801,Hospital San Antonio de Putaendo
+802,ADMINISTRACIÓN DIRECTA REGIÓN DE LA ARAUCANIA
+803,DIRECCION DE INGENIERIA DE SISTEMAS NAVALES
+804,C.I.R.N.
+805,Brigada de Operaciones Especiales - BOE
+806,Fondos Extrapresupuestarios Escipol
+807,Dirección de Arquitectura - X Región
+808,Dirección de Arquitectura - V Región
+809,SERVICIO DE SALUD DEL MAULE HOSPITAL DE MOLINA
+810,INSTITUTO NACIONAL DE ESTADISTICAS
+811,SERVICIO HIDROGRAFICO Y OCEANOGRAFICO
+812,Hospital de Constitución
+813,Ala Base N°4
+814,Dirección de Vialidad - RM - Dirección Regional
+815,ADQUISICIONES EDUCACION
+816,Subsecretaría de Derechos Humanos
+817,SUBSECRETARIA DE ECONOMIA Y EMPRESAS DE MENOR TAMA
+818,Dpto. Educación
+819,SEDE VALLENAR
+820,Tesoreria Regional Santiago Poniente
+821,IMUNI_RENCA ADQUISICIONES
+822,Seremi Aysen
+823,Corporación de Asistencia Judicial  Los Ríos
+824,UNIDAD DE COMPRA TEMUCO
+825,SUBSECRETARIA DE LAS CULTURAS Y LAS ARTES
+826,I. Municipalidad de Malloa
+827,05 - Región de Valparaiso
+828,I MUNICIPALIDAD DE SAN PEDRO DE LA PAZ
+829,Cultura
+830,Departamento Finanzas-Adquisiones
+831,Seremi Salud R.M.
+832,FAC.CS.SOCIALES Facultad de Ciencias Sociales
+833,DIRECCION DE DESARROLLO COMUNITARIO
+834,Intendencia Region Metropolitana
+835,I MUNICIPALIDAD DE SANTA CRUZ
+836,VI Región - Provincial Colchagua
+837,Sernam VI Región
+838,Jdo de Letras y Garantia de TalTal
+839,HOSPITAL DE PUERTO OCTAY
+840,Jdo de Familia de Puerto Varas
+841,I MUNICIPALIDAD DE PAILLACO
+842,Depto. de Salud e Higiene Ambiental
+843,I MUNICIPALIDAD DE RIO BUENO
+844,Ilustre Municipalidad de Futrono
+845,Adquisiciones Contratos y Licitaciones
+846,Licitaciones y Costos
+847,I MUNICIPALIDAD DE PELARCO
+848,SERVICIO LOCAL DE EDUCACIÓN PÚBLICA MAULE COSTA
+849,Administración de Fondos Extrapresupuestarios
+850,14° Jdo de Garantia de Santiago
+851,DEPARTAMENTO EDUCACION MUNICIPALIDAD DE SAN CLEMENTE
+852,Hospital Militar de Santiago- HMS
+853,Corporación de Investigación y Avance de la Paleontología e Historia Natural de Atacama
+854,Administración
+855,Departamento Municipal
+856,Departamento Provincial de Educación Huasco
+857,Jdo de Familia de Coronel
+858,Dirección General
+859,Hospital Sanatorio San José de Maipo
+860,MANTENIMIENTO-REPARACIONES
+861,Direccion Regional del Maule
+862,Direccion de Adquisiciones
+863,X Región - Llanquihue
+864,I. Municipalidad de Malloa - Departamento de Salud
+865,SEREMI XI Región
+866,UCHILE Vicerrectoria de Investigacion y Desarrollo
+867,"SEREMÍA DE LAS CULT , ARTES Y PAT REGIÓN DE ÑUBLE"
+868,Instituto de Desarrollo Agropecuario - INDAP
+869,I.MUNICIPALIDAD DE PEÑALOLEN
+870,DEPTO. EDUCACION MUNICIPALIDAD DE CHILLAN
+871,CEIA Fermin Fierro Luengo
+872,Dirección de infraestructura y equipamiento
+873,Dirección Servicio Nacional del Patrimonio Cultura
+874,Escuela de Caballería Blindada - ESC CBL
+875,SALUD_ZAPALLAR
+876,Administracion Y Finanzas
+877,UNIDAD DE ADMINISTRACIÓN Y FINANZAS
+878,P01
+879,Salud - Adquisiciones
+880,CORPORACION MUNICIPAL DE DESARROLLO SOCIAL DE MACUL
+881,ABASTECIMIENTO HBL
+882,DEPTO. DE BIENESTAR SOCIAL (M)
+883,Adquisiones
+884,IMUNI_LOPRADO ADQUISICIONES
+885,Cesfam Curimon
+886,C - Subdireccion Administracion y Finanzas SAF
+887,MUSEO GABRIELA MISTRAL DE VICUÑA
+888,CORP NACIONAL DE DESARROLLO INDIGENA
+889,4057-Educacion
+890,Proyecto Bienestar 2024
+891,Alimentos de Uso Médico
+892,DEPARTAMENTO SALUD MUNICIPALIDAD DE SAN CLEMENTE
+893,Defensoria Regional de Arica y Parinacota
+894,CENTRO DE ABASTECIMIENTO (M) (ADQ)
+895,CORPORACION MUNICIPAL DE DEPORTES DE PEÑAFLOR
+896,Regional Sur-Oriente
+897,Municipalidad de Santa Juana
+898,FAC.CS.QUIMICAS Lab. Antidoping
+899,Seremi Los Rios
+900,Corp. Adm. del Poder Judicial - Santiago
+901,INDAP - Region de Tarapaca
+902,XII Región - Oficina Provincial Ultima Esperanza
+903,SENDA-DIRECCION REGIONAL ARAUCANIA
+904,DELEGACIÓN PRESIDENCIAL PROVINCIAL DE TIERRA DEL F
+905,Compra Agil - Coord Nacional de Tecnología
+906,UNIDAD DE PROGRAMACIÓN Y DIFUSIÓN PATRIMONIAL
+907,I.MUNICIPALIDAD DE LA CRUZ
+908,I MUNICIPALIDAD DE QUINTA DE TILCOCO
+909,DEPARTAMENTO EDUCACION
+910,Municipalidad de Saavedra-Salud
+911,135-0
+912,FARMACIA MEDICAMENTOS
+913,adquisiciones daem II
+914,Corporación Municipal de Turismo de Vicuña
+915,Junji - XII Región
+916,EDUCACIÓN
+917,Ilustre Municipalidad de Llanquihue
+918,Direccion de Gestion Del Riesgo y Emergencias
+919,Extrapresupuestaria - CET Cerrado CCP Copiapó
+920,Compra Agil - Liderazgo Directivo para el DPD
+921,CORP MUNICIPAL DE DESARROLLO SOCIAL DE IQUIQUE
+922,Dirección de Aseo Ornato y Mantencion
+923,Delegacion Presidencial Provincial de Choapa
+924,Unidad de Compra de Bienes y Servicios
+925,Mineduc Administración III Región
+926,Departamento Adquisiciones ME
+927,Gobernación Provincial de Parinacota
+928,VICERRECTORIA DE INVESTIGACION Y DESARROLLO
+929,Ilustre Municipalidad de Rinconada
+930,Superintendencia de Servicios Sanitarios - SISS
+931,Servicio Agricola y Ganadero (SAG central)
+932,HOSPITAL DE FRUTILLAR
+933,KAMPENAIKE
+934,Corporación de Asistencia Judicial Aysén
+935,ESTACION NAVAL DE ISLA DAWSON
+936,Departamento de Educacion
+937,FAC.CS.AGRONOMICAS Dirección Económ. y Adm
+938,Dirección de Aeropuertos - VIII Región
+939,DESAMU
+940,CORPORACION MUNICIPAL DE INNOVACION Y DESARROLLO ECONOMICO Y SOCIAL DE SAN JOAQUIN
+941,SEREMI IX REGION
+942,SEGEGOB IX REGION
+943,Servicio de Bienestar
+944,Extrapresupuestaria - CET Cerrado CCP Colina 1
+945,Destacamento Montaña Nº 17 Los Ángeles-DESMÑA N°17
+946,IPS Region Aysen del Gral Carlos Ibanez del Campo
+947,TAMELAIKE
+948,Regimiento Escolta Presidencial N° 1 Granaderos
+949,Adquisiciones DESAM
+950,Dirección Regional IX Región
+951,Departamento de Salud Municipal Carahue
+952,R.M - Servicio Nacional de Pesca y Acuicultura
+953,Senado de la República de Chile
+954,Centro Clínico Militar Valdivia - CCM Valdivia
+955,I.Municipalidad de Ñiquen
+956,Servicio de Salud Viña del Mar - Quillota
+957,VAEC Federacion de Estudiantes
+958,Linea de  Curadurias
+959,Corporación Municipal de Lo Prado
+960,DEPARTAMENTO ADMINISTRATIVO
+961,COMPRAS Y CONTRATACIONES DEL CEMENTERIO
+962,GOBERNACION MARITIMA DE COQUIMBO
+963,SUBDIRECCIÓN ARCHIVO NACIONAL DOS
+964,Secretaria Comunal de Planificación
+965,Tesorería Provincial de La Ligua
+966,SERVIU XI REGION
+967,XVI - OFICINA REGIONAL DE ÑUBLE
+968,Departamento Salud  Quilleco
+969,Zona de Bienestar Coyhaique
+970,Región de La Araucanía
+971,Dirección Regional Aduana de Punta Arenas
+972,salud
+973,Dirección Regional de Los Lagos
+974,Dirección Regional VIII Región
+975,Departamento Provincial Cautin Norte
+976,Hospital Puerto Cisnes
+977,I MUNICIPALIDAD DE MONTEPATRIA
+978,VIII Región - Provincial Arauco
+979,Regional Antofagasta
+980,Dpto. de Salud
+981,DELEGACION PRESIDENCIAL PROVINCIAL DE MAIPO
+982,"Regimiento N° 9 ""Chillán"""
+983,IMUNI_LOSANGELES ADQUISICIONES
+984,Seremi Valparaiso
+985,Gobierno Regional del Maule
+986,FR BIO BIO
+987,Jef Adm y Logística - Campo Militar Cachapoal
+988,GOBERNACION MARITIMA DE AYSEN
+989,DIRECCION NACIONAL
+990,Unidad de Administracion y Finanzas
+991,SII DR15 Dirección Regional Santiago Oriente
+992,I MUNICIPALIDAD DE SAN FERNANDO
+993,Departamento de Finanzas y Adquisiciones
+994,Agencia Nacional de Investigación y Desarrollo
+995,SUBDIRECCIÓN NACIONAL DE PATRIMONIO INMATERIAL
+996,Educación DAEM
+997,Compra Agil - Centro de Innovación
+998,Gobierno Regional de Aysen - XI Región
+999,CORPORACION DE FOMENTO DE DESARROLLO COMUNAL Y PRODUCTIVO
+1000,Adquisiciones Deporte
+1001,Unidad de compra Finanzas
+1002,ADMINISTRACION Y FINANZAS - DEPTO ADQUISICIONES
+1003,Compra Agil - Formación Inicial Docente
+1004,Tesoreria Provincial de Lebu
+1005,SLEPB PROGRAMA 1
+1006,DIR. COMUNAL DE SALUD
+1007,Hospital San Juan de Dios de Los Andes
+1008,Dirección Regional de Ñuble
+1009,O.A.I. Isla de Pascua CONADI
+1010,Ilustre Municipalidad de San Joaquin
+1011,SENCE II REGION
+1012,DIRECCION DE INFORMATICA
+1013,Seremi de Salud V Región
+1014,Departamento Educacion
+1015,DIRECCION GENERAL DEL TERRITORIO MARIT Y MM (AB)
+1016,Regional Arica-Parinacota
+1017,BIENESTAR METROPOLITANA DE SANTIAGO
+1018,CABO ODGER
+1019,Compra Agil - DEG
+1020,Regional Los Rios
+1021,Gobierno Regional de Aysén - DIT
+1022,Mineduc Administración VIII Región
+1023,Municipal
+1024,Municipalidad de Pucon
+1025,SII DR07 Dirección Regional Talca
+1026,Seremi Arica y Parinacota
+1027,Ilustre Municipalidad de La Unión
+1028,Municipalidad de lo Barnechea - Adquisiciones - Consistorial
+1029,Unidad de Educacion
+1030,ESCUELA DE GRUMETES
+1031,Ministerio del Interior - Intendencia X Región
+1032,Corporación Yunus
+1033,2da Brigada Acorazada Cazadores - 2DA BRIACO
+1034,UNIDAD PRAIS CENTRO REFERENCIA SALUD CRS
+1035,GORE ANTOFAGASTA PROGRAMA 01 FUNCIONAMIENTO
+1036,Hospital de Peumo
+1037,ADMINISTRACION ADUANA DE PUERTO AYSEN
+1038,Subsecretaría de Evaluación Social
+1039,Estado Mayor Conjunto
+1040,Farmacos
+1041,Servicio de Salud  Concepción
+1042,FUNDACION MUNICIPAL DE CULTURA DE ZAPALLAR
+1043,CSC Calera de Tango
+1044,Seremi de Salud II Región
+1045,División de Administración y Finanzas
+1046,CORPORACION MUNICIPAL DE DEPORTES Y RECREACION DE
+1047,Departamento Comunal de Educación
+1048,IMunicipalidad de San Antonio
+1049,HOSPITAL NAVAL ALMIRANTE NEF
+1050,IMUNI_IQUIQUE ADQUISICIONES
+1051,SECC COM ZONA CARAB MAGALLANES Y ANTARTICA CHILENA
+1052,MUNICIPALIDAD DE PENCAHUE
+1053,DIRECCION REGIONAL DEL BIO-BIO
+1054,Delegación Presidencial Provincial Cardenal Caro
+1055,Hospital Santa Juana
+1056,I.N.D. REGION XIV
+1057,Direccion de Obras Municipales
+1058,INE -  I REGION
+1059,HOSPITAL CALBUCO
+1060,GOBERNACION MARITIMA DE TALCAHUANO
+1061,Farmacia
+1062,DIRECCION REGIONAL DE ANTOFAGASTA
+1063,Escuadrilla de Abastecimiento BALCE
+1064,Escuela Diego Dublé Urrutia
+1065,ACADEMIA POLITECNICA NAVAL
+1066,I MUNICIPALIDAD DE CHAITEN
+1067,Regional Nor-Poniente
+1068,Consejo Regional de la Cultura y las Artes Valparaíso
+1069,DIRECCIÓN REGIONAL DE LOS LAGOS
+1070,Unidad de Análisis Financiero
+1071,H_Petorca
+1072,CENTRAL DE ATENCION PRIMARIA DE SALUD DE LA ARMADA
+1073,Mineduc Administración IV Región
+1074,X Región  - Provincial Osorno
+1075,Administracion Central
+1076,Hospital Militar del Norte - HMN
+1077,MUNICIPALIDAD DE BUIN- ADQUISICIONES
+1078,DIRECTORIO DE TRANSPORTES DE SANTIAGO - MTT
+1079,SAG - Coquimbo
+1080,XIV Region - Provincial Valdivia
+1081,Hospital Santa Filomena de Graneros
+1082,"División de Bienestar ZB ""Valparaíso"" BSoc"
+1083,Centro Clínico Militar Punta Arenas - CCM Pta Aren
+1084,CENTRO DE ABASTECIMIENTO AVIACION NAVAL
+1085,BIENESTAR - SSA
+1086,MUSEO HISTORIA NATURAL DE CONCEPCIÓN
+1087,ADQUISICIONES II
+1088,Economato CCP Colina I
+1089,Centro Rehabilitación Infantil - CRIE
+1090,INE -   XI Región
+1091,Escuela de Suboficiales  - ESCSOF
+1092,Regimiento Logístico del Ejército Nº2 Arsenales de Guerra
+1093,Junaeb Región de Arica y Parinacota
+1094,Centro Médico Militar Rosa O'Higgins
+1095,Hospital Psquiatrico del Salvador
+1096,RRHH-Capacitacion
+1097,Subsecretaría para las Fuerzas Armadas
+1098,Fac de Gobierno Dirección de Administ  y Finanzas
+1099,Direccion de Desarrollo Comunitario
+1100,Extrapresupuestaria-CET Valparaíso
+1101,INE - XIV REGION
+1102,SUPEREDUC DIRECCION REGIONAL VIII
+1103,Corporación Municipal De Cultura y Deportes de Recoleta
+1104,Hospital de Rengo
+1105,COMISION PARA EL MERCADO FINANCIERO
+1106,Consejo Regional de la Cultura y las Artes de Magallanes
+1107,SECCIÓN COMPRAS ZONA DE CARABINEROS LOS LAGOS
+1108,Departamento Provincial de Educación Sur
+1109,Corporación de Desarrollo Social de la Municipalidad de Independencia
+1110,Hospital Vilcún
+1111,Regional Maule
+1112,MUNICIPALIDAD DE FRUTILLAR
+1113,Hospital La Ligua
+1114,BIENESTAR SII - DR LA SERENA
+1115,UNIDAD DE COMPRA AMB
+1116,Regional Atacama
+1117,Escuela Los Maitenes - MUNICIPALIDAD LIMACHE
+1118,DELEGACION PRESIDENCIAL PROVINCIAL DE CAUQUENES
+1119,Seremi de Salud Arica y Parinacota
+1120,Superintendencia de Electricidad y Combustibles
+1121,MINISTERIO DE BIENES NACIONALES
+1122,ELEAM SENAMA LICANTEN
+1123,SAG - Atacama
+1124,VIII - Servicio Nacional de Pesca y Acuicultura
+1125,HOSPITAL DE CHAITEN
+1126,Escuela de Infantería - ESCINF
+1127,Departamento Provincial de Educación Cardenal Caro
+1128,Adquisiciones  Obras
+1129,Servicio Nacional de Capacitación y Empleo
+1130,SEREMI ÑUBLE
+1131,DIRECCION REGIONAL LA ARAUCANIA
+1132,IMUNI_OSORNO DIRECCION DE ADM Y FINANZAS
+1133,SECPLAC 2
+1134,Dirección Regional XI Región
+1135,IPS Region de Magallanes y Antartica Chilena
+1136,Hospital Pichilemu
+1137,Unidad de Compra – Región de Aysén
+1138,Planeamiento - II Región
+1139,MUSEO ARQUEOLOGICO DE LA SERENA
+1140,DICOMPRAS
+1141,Fac de Gobierno Unidad Formac continua y capacitac
+1142,Corporación Municipal de Desarrollo Social San Joaquín
+1143,Hospital Combarbalá
+1144,CALIDAD DE VIDA Y BIENESTAR DE PERSONAL
+1145,Corp. Adm. del Poder Judicial - Coyhaique
+1146,CORPORACION MUNICIPAL DE FOMENTO AL DESARROLLO COMUNAL Y PRODUCTIVO DE
+1147,JENABIEN
+1148,DIRECCION DE INFRAESTRUCTURA COMUNAL
+1149,Municipalidad de Ollagüe
+1150,Tesorería General de la República
+1151,Región de Arica y Parinacota
+1152,Hospital Carahue
+1153,CORPORACION MUNICIPAL DE DEPORTES DE LA PINTANA
+1154,Servicios
+1155,FCFM Departamento de Ingeniería Industrial
+1156,"Hospital Clinico "" General Dr. Raúl Yazigi J."""
+1157,SERVIU Metropolitano
+1158,Direccion De Administracion Y Finanzas
+1159,Instituto Geográfico Militar -IGM
+1160,Depto Salud
+1161,1° Jdo de Familia de San Miguel
+1162,ESTABLECIMIENTOS EDUCACIONALES
+1163,COMISION NACIONAL DE ACREDITACION
+1164,Dirección Regional de Tarapacá
+1165,Dirección de Educación Municipal
+1166,Dirección de Vialidad - VIII Región - Dirección Regional
+1167,HOSPITAL DE LAS FF.AA. CIRUJANO GUZMAN
+1168,Hospital Til - Til
+1169,Gobierno Regional de Los Lagos
+1170,Dirección Regional Aduana de Talcahuano
+1171,"ESCRITORIO, ASEO Y OTROS"
+1172,Departamento Provincial El Loa
+1173,Unidad de Compras Públicas
+1174,Cementerio
+1175,LSDH 91 SARGENTO ALDEA
+1176,CENTRO DE ABASTECIMIENTO IQUIQUE
+1177,ADQUISICIONES - DIRECC ADMIN Y FINANZAS
+1178,I MUNICIPALIDAD DE CHANARAL
+1179,Dirección económica y administrativa.
+1180,Consultorio - Farmacia
+1181,BIENESTAR SEREMI VIII BIO BIO
+1182,ADMINISTRACIÓN DIRECTA REGIÓN DE ARICA
+1183,SECCIÓN COMPRAS ZONA METROPOLITANA
+1184,adquisiciones
+1185,Jdo de Garantia de Temuco
+1186,TURISMO
+1187,Mineduc Administración XI Región
+1188,Dirección General de Aguas - VI Región
+1189,I MUNICIPALIDAD DE SALAMANCA
+1190,SECPLAC
+1191,10 - Región de los Lagos
+1192,ADMINISTRACION Y FINANZAS - ADQUISICIONES
+1193,Gobierno Regional de Arica y Parinacota
+1194,DIRECCION DE RECUPERACION DE UNIDADES DE LA ARMADA
+1195,RELACIONES PUBLICAS
+1196,DIRECCION REGIONAL ANTOFAGASTA
+1197,Seremi de Salud VII Región
+1198,Cotizaciones - ISP
+1199,Escuela Brasilia - MUNICIPALIDAD LIMACHE
+1200,SERVICIO DE SALUD HOSPITAL DE CHIMBARONGO
+1201,Subsecretaría de Defensa
+1202,Extrapresupuestaria - CET Cañete
+1203,UNIDAD TÉCNICA PLANIFICACIÓN-OBRAS
+1204,Dirección de Finanzas
+1205,Seremi de Salud de XII Región
+1206,Cuerpo Militar del Trabajo Subjefatura Zonal Coyhaique
+1207,Departamento de Salud - D.S.M.
+1208,FCFM Departamento de Geofísica
+1209,"Destacamento de Montaña N° 8 ""Tucapel"" DESMÑA N° 8"
+1210,Tesorería Provincial de San Fernando
+1211,Ilustre Municipalidad de Chillan Viejo
+1212,CARILLANCA
+1213,INSTITUTO TECNOLOGICO
+1214,CNTV
+1215,"Regimiento N° 21 ""Coquimbo"""
+1216,IPS Region de Antofagasta
+1217,Depto.I.O.Crim.O.S.9
+1218,Direccion Regional del Bio Bio
+1219,GOBERNACION MARITIMA DE VALDIVIA
+1220,Hospital Licantén
+1221,ISL Región del Maule
+1222,Dispositivos Médicos
+1223,Compra ágil - Comunicaciones
+1224,VAEGI-DSI- Habililitacion VM20
+1225,Aeropuerto Arturo Merino Benítez
+1226,Depto. De Educacion
+1227,I MUNICIPALIDAD DE VALLENAR
+1228,FR ARICA Y PARINACOTA
+1229,DELEGACIÓN PRESIDENCIAL PROVINCIAL DE MALLECO
+1230,P02 SLEP ATACAMA
+1231,XI Región - Oficina Regional de Aysén
+1232,Ilustre Municipalidad de los Lagos
+1233,Municipalidad de Temuco-Educación
+1234,Unidad de Pasos Fronterizos
+1235,I Región - Oficina Regional de Tarapacá
+1236,BIENESTAR SII - DR COYHAIQUE
+1237,11 - Región de Aysen General Carlos Ibanez del C.
+1238,Hospital de Carabineros
+1239,SERVIU REGION DEL BIOBIO
+1240,I MUNICIPALIDAD DE PUMANQUE
+1241,FUND NACIONAL DE ORQUESTAS JUVENILES E INFANTILES
+1242,MUNICIPALIDAD DE PADRE LAS CASAS  EDUCACION
+1243,Corporación Municipal de Deportes de Colina
+1244,SEREMI LOS LAGOS
+1245,SENDA-DIRECCIÓN REGIONAL DE VALPARAISO
+1246,CORPORACION CULTURAL DE MOSTAZAL
+1247,COMANDANCIA EN JEFE DE LA FUERZA DE SUBMARINOS
+1248,COMPRAS NORMALES
+1249,DIRECCION GENERAL DE FINANZAS DE LA ARMADA
+1250,DEPTO QUIMICA
+1251,Mineduc Administración VII Región
+1252,Departamento Comunal de Salud
+1253,BASE DE SUBMARINOS
+1254,CSC Valparaiso
+1255,Planeamiento - X Región
+1256,SERVIU ADMINISTRACION
+1257,Junaeb Región Metropolitana
+1258,Hospital Cristina Calderon
+1259,VAEC Hogar Universitario Juan Gómez Millas
+1260,Educación Municipal
+1261,ADQUISICIONES SALUD
+1262,Corp. Adm. del Poder Judicial - Temuco
+1263,Hospital de Cunco
+1264,DEPARTAMENTO DE  FINANZAS MUNICIPAL
+1265,ATENCION PRIMARIA DIRECCION
+1266,Daf
+1267,Generales
+1268,ADMINISTRACIÓN DIRECTA REGIÓN DEL BIOBÍO
+1269,SECCION ADQUISICIONES
+1270,Dirección Comunal De Educación
+1271,SALUD CORPORACION MUNICIPAL DE PUNTA ARENAS
+1272,ABASTECIMIENTO HAH
+1273,SERVICIO MEDICO LEGAL
+1274,Municipalidad De Calbuco
+1275,VAA  - UGPA  Unidad de Gestión de Proy Académicos
+1276,Dirección de Vialidad - XIV Región - Dirección Regional
+1277,Insumos Clínicos Varios
+1278,Jdo de Letras del Trabajo de San Bernardo
+1279,Programa  Mi Abogado Concepción
+1280,Comando de Personal CEAFOSS
+1281,UCHILE Vicerrectoría Asuntos Académicos
+1282,FAC.CS.QUIMICAS - Proyectos
+1283,Subsecretaria de Redes Asistenciales
+1284,Central Odontológica del Ejército -  COE
+1285,DIRECCION REGIONAL DE ARICA Y PARINACOTA
+1286,Propuestas y Contratos
+1287,MUNICIPALIDAD DE LOS ANGELES - SALUD
+1288,"ESCUELA NAVAL ""ARTURO PRAT"""
+1289,Administración de Fondos
+1290,VIII region - Concepcion
+1291,Compras Menores
+1292,Servicio de Salud Coquimbo
+1293,Alcaldia
+1294,Dirección de Obras Portuarias - Valdivia
+1295,Defensoría del Contribuyente
+1296,CAMPUS PUERTO MONTT
+1297,Gobierno Regional de Los Ríos
+1298,Centro de Referencia de Salud Hospital Provincia Cordillera
+1299,DIRECCION SERVICIO DE SALUD TALCAHUANO
+1300,Hospital Regional Rancagua - HRR
+1301,SEREMI I Región
+1302,Hospital Pedro Morales C.
+1303,UCHILE Facultad  de Comunicación e Imagen
+1304,DEPARTAMENTO DE ODONTOLOGÍA
+1305,FCFM Departamento de Geología
+1306,Academia de Ciencias Policiales de Carabineros
+1307,SLEP Del Pino 01
+1308,SECCIÓN COMPRAS ZONA SEG PRIV CONTROL ARMAS Y EXPL
+1309,H Contulmo
+1310,Ilustre Municipalidad de Vicuña
+1311,I.N.D. REGION III
+1312,DAEM LA ESTRELLA
+1313,Instituto Nac. de Rehabilitación Pedro Aguirre C.
+1314,ESCUELA VILLA HUEQUEN
+1315,HOSPITAL HERNAN HENRIQUEZ ARAVENA - OPERACIONES
+1316,SLEPCH - Programa 01
+1317,Consejo para la Transparencia
+1318,"Jef Adm y Logística - Campo Militar ""Austral"""
+1319,DELEGACION DE BIENESTAR SOCIAL (S)
+1320,HOSPITAL DR HERNAN HENRIQUEZ A COMPRA DE SERVICIO
+1321,Dirección Nacional del Servicio Civil
+1322,Dpto. de Abastto. del Cuartel General
+1323,01 Organismo Central-Rectoria-Prorrectoria
+1324,VAEC Servicio Médico y Dental de Alumnos
+1325,I MUNICIPALIDAD DE EMPEDRADO
+1326,Servicio de Salud Atacama
+1327,Consignaciones
+1328,4058-Salud
+1329,SECC COMPRAS ZONA DE CARAB LIB BERNARDO OHIGGINS
+1330,UCHILE Facultad de Odontologia
+1331,Daem   Quilleco
+1332,Direccion de Vialidad - XI Región - Provincia de Cochrane
+1333,Dirección Regional de Iquique
+1334,ABAST-SERVICIOS-CL
+1335,Corp. Adm. del Poder Judicial - Copiapó
+1336,Serviu Región de Los Ríos - Valdivia
+1337,Departamento Provincial Cauquenes
+1338,Zona de Bienestar Antofagasta
+1339,Escuela Jose Elias Bolivar Herrera
+1340,Depto. Provincial Educación Llanquihue
+1341,Cuartel General II División Motorizada - II DIVMOT
+1342,I MUNICIPALIDAD DE NANCAGUA
+1343,Dpto. Administraciòn y Finanzas
+1344,Depto. Provincial Educación  Valdivia
+1345,FONDOS DE TERCEROS
+1346,GOBERNACION MARITIMA DE ANTOFAGASTA
+1347,1058037 Fármacos HTC
+1348,Cormudep Calama
+1349,prodesal
+1350,PROYECTOS Y LOGISTICA DESAM
+1351,I.N.D.  REGION VII
+1352,Economato
+1353,FARMACIA HBL
+1354,Dicompras SIN AT
+1355,Adquisiciones No Clinicas
+1356,INSIGNIA COMANDANCIA EN JEFE DE LA Ia ZONA NAVAL
+1357,MN FONDO DE TERCEROS
+1358,Dirección Regional de Araucanía SBAP
+1359,ILUSTRE MUNICIPALIDAD DE CANELA
+1360,BIENESTAR HAGP
+1361,Reactivos
+1362,Mineduc Administración I Región
+1363,SLEPCH - EE - Programa 02
+1364,INSUMOS CLINICOS HBL
+1365,ILUSTRE MUNICIPALIDAD DE MACUL
+1366,Economatos-Región de Arica y Parinacota
+1367,FR ÑUBLE
+1368,COMPRAS Y CONTRATACIONES DE SALUD
+1369,Dirección del Trabajo VI Región Libertador Bdo Oh
+1370,SEREMI IV REGION
+1371,Departamento Provincial de Linares
+1372,REMEHUE
+1373,INE - XII Región
+1374,Dirección de Aeropuertos - XI Región
+1375,Convenios Extrapresupuestarios
+1376,SERVICIO SALUD COQUIMBO HOSP DE SALAMANC
+1377,Direccion de  Administracion y Finanzas
+1378,AGCID
+1379,ADMINISTRACIÓN DIRECTA REGIÓN DE TARAPACÁ
+1380,V - Servicio Nacional de Pesca y Acuicultura
+1381,Administración y Finanzas - Abastecimiento
+1382,Escuela de Equitación - EEQ
+1383,CENTRO NACIONAL DE CONSERVACIÓN Y RESTAURACIÓN
+1384,PREDIOS FISCALES IIa. ZONA NAVAL
+1385,Dirección de Vialidad - I Región - Dirección Regional
+1386,FACULTAD DE HUMANIDADES Y EDUCACION
+1387,Unidad de Gestión Institucional
+1388,Polideportivo
+1389,Abastecimiento (Economato)
+1390,Corp. Adm. del Poder Judicial -  Valparaiso
+1391,Centro de Salud Cordillera Andina
+1392,DIRECCION DE SALUD COMUNAL
+1393,Centro Cultural
+1394,Depto.Transportes L.3
+1395,Fomento Productivo
+1396,Dirección Nacional de Aduanas
+1397,Dirección Regional de Valparaíso SBAP
+1398,DIVBIE - Almacén Militar del Ejército
+1399,Hospital Diego de Almagro
+1400,Comisión Chilena del Cobre - COCHILCO
+1401,I.N.D. REGION VIII
+1402,VAEC Hogar Universitario Mario Ojeda
+1403,Junji - Región Metropolitana
+1404,INSIGNIA COMANDANCIA EN JEFE DE LA IIIa ZONA NAVAL
+1405,SUBSECRETARÍA DEL PATRIMONIO CULTURAL
+1406,MUSEO DE ARTE Y ARTESANIA DE LINARES
+1407,INSIGNIA COMANDANCIA EN JEFE DE LA IIa ZONA NAVAL
+1408,Servicios Varios
+1409,INSTITUTO NACIONAL DE DESARROLLO SUSTENTABLE DE LA
+1410,UCHILE Rectoría
+1411,Compras Convenio GORE Araucanía Norte
+1412,CENTRAL ODONTOLOGICA IIA. ZONA NAVAL
+1413,Hospital Nueva Imperial
+1414,Compras Convenio GORE Magallanes
+1415,UNIDAD DE COMPRA INSTRUCCIÓN
+1416,Hospital Traiguén
+1417,Región del Maule
+1418,Dirección General de Aguas - XII Región
+1419,DIRECCION COMUNAL DE SALUD- CORP MARIA PINTO
+1420,Seremi de Salud IV  Región
+1421,Unidad de Compras Farmacia
+1422,Municipalidad De Ninhue-Salud
+1423,"Regimiento N° 19 ""Colchagua"""
+1424,DELEGACIÓN PRESIDENCIAL PROVINCIAL DE CAPITÁN PRAT
+1425,DIRECCION DE ABASTECIMIENTO DE LA ARMADA
+1426,DAF/ADQUISICIONES
+1427,UNIDAD DE COMPRA SERVICIOS GENERALES
+1428,"Regimiento de Inteligencia del Ejercito N 1 ""Soberania"""
+1429,Sea - XII Región
+1430,Dirección Servicio Salud Araucanía Sur
+1431,ARSENAL NAVAL TALCAHUANO
+1432,Dirección de Vialidad - RM - Provincia de Melipilla
