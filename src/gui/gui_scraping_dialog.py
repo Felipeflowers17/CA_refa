@@ -1,153 +1,107 @@
 # -*- coding: utf-8 -*-
 """
-Diálogo de Configuración de Scraping (Moderno y Funcional).
+Diálogo de Configuración de Scraping.
 """
 
 from datetime import date
 from PySide6.QtCore import QDate, Signal, Slot, Qt
 from PySide6.QtWidgets import QDialog, QVBoxLayout, QHBoxLayout, QWidget
 
-# FLUENT WIDGETS
 from qfluentwidgets import (
     SubtitleLabel, BodyLabel, CalendarPicker, 
     SpinBox, ComboBox, PrimaryPushButton, PushButton
 )
-
 from src.utils.logger import configurar_logger
 
 logger = configurar_logger(__name__)
 
-
-class ScrapingDialog(QDialog):
+class DialogoScraping(QDialog):
     """
-    Ventana de diálogo moderna para configurar scraping.
-    Usa QDialog estándar para evitar conflictos de eventos con los popups,
-    pero implementa widgets de Fluent UI para el estilo.
+    Ventana modal para configurar los parámetros de búsqueda (Fechas, Páginas).
     """
 
-    start_scraping = Signal(dict)
+    senal_iniciar_scraping = Signal(dict)
 
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.setWindowTitle("Configurar Nuevo Scraping")
+        self.setWindowTitle("Configurar Búsqueda")
         self.resize(450, 400)
-        
-        # Fondo blanco/oscuro según tema (Fluent style)
         self.setObjectName("ScrapingDialog")
-        # Estilo básico para que no se vea gris antiguo (Qt StyleSheet)
-        self.setStyleSheet("""
-            QDialog {
-                background-color: palette(window);
-            }
-        """)
+        self.setStyleSheet("QDialog { background-color: palette(window); }")
 
-        # Layout Principal
-        self.mainLayout = QVBoxLayout(self)
-        self.mainLayout.setContentsMargins(24, 24, 24, 24)
-        self.mainLayout.setSpacing(16)
+        self.layout_principal = QVBoxLayout(self)
+        self.layout_principal.setContentsMargins(24, 24, 24, 24)
+        self.layout_principal.setSpacing(16)
 
-        # Título
-        self.titleLabel = SubtitleLabel("Parámetros de Búsqueda", self)
-        self.mainLayout.addWidget(self.titleLabel)
+        self.lbl_titulo = SubtitleLabel("Parámetros de Extracción", self)
+        self.layout_principal.addWidget(self.lbl_titulo)
 
-        # --- SECCIÓN FECHAS ---
-        
-        # Contenedor de fechas
-        self.datesContainer = QWidget()
-        self.datesLayout = QHBoxLayout(self.datesContainer)
-        self.datesLayout.setContentsMargins(0, 0, 0, 0)
+        # --- FECHAS ---
+        self.contenedor_fechas = QWidget()
+        self.layout_fechas = QHBoxLayout(self.contenedor_fechas)
+        self.layout_fechas.setContentsMargins(0, 0, 0, 0)
         
         # Desde
-        self.vboxFrom = QVBoxLayout()
-        self.lblFrom = BodyLabel("Desde:", self)
-        self.dateFromPicker = CalendarPicker(self)
-        self.dateFromPicker.setDate(QDate.currentDate().addDays(-7))
-        self.dateFromPicker.setDateFormat(Qt.ISODate) # Formato yyyy-MM-dd
-        self.vboxFrom.addWidget(self.lblFrom)
-        self.vboxFrom.addWidget(self.dateFromPicker)
+        v_desde = QVBoxLayout(); lbl_d = BodyLabel("Desde:", self)
+        self.cal_desde = CalendarPicker(self)
+        self.cal_desde.setDate(QDate.currentDate().addDays(-7))
+        self.cal_desde.setDateFormat(Qt.ISODate) 
+        v_desde.addWidget(lbl_d); v_desde.addWidget(self.cal_desde)
         
         # Hasta
-        self.vboxTo = QVBoxLayout()
-        self.lblTo = BodyLabel("Hasta:", self)
-        self.dateToPicker = CalendarPicker(self)
-        self.dateToPicker.setDate(QDate.currentDate())
-        self.dateToPicker.setDateFormat(Qt.ISODate)
-        self.vboxTo.addWidget(self.lblTo)
-        self.vboxTo.addWidget(self.dateToPicker)
+        v_hasta = QVBoxLayout(); lbl_h = BodyLabel("Hasta:", self)
+        self.cal_hasta = CalendarPicker(self)
+        self.cal_hasta.setDate(QDate.currentDate())
+        self.cal_hasta.setDateFormat(Qt.ISODate)
+        v_hasta.addWidget(lbl_h); v_hasta.addWidget(self.cal_hasta)
         
-        self.datesLayout.addLayout(self.vboxFrom)
-        self.datesLayout.addSpacing(20)
-        self.datesLayout.addLayout(self.vboxTo)
-        
-        self.mainLayout.addWidget(self.datesContainer)
+        self.layout_fechas.addLayout(v_desde)
+        self.layout_fechas.addSpacing(20)
+        self.layout_fechas.addLayout(v_hasta)
+        self.layout_principal.addWidget(self.contenedor_fechas)
 
-        # --- SECCIÓN LÍMITE ---
-        self.vboxLimit = QVBoxLayout()
-        self.lblLimit = BodyLabel("Límite de páginas (0 = Todo):", self)
-        self.pageLimitSpin = SpinBox(self)
-        self.pageLimitSpin.setRange(0, 1000)
-        self.pageLimitSpin.setValue(0)
-        self.vboxLimit.addWidget(self.lblLimit)
-        self.vboxLimit.addWidget(self.pageLimitSpin)
-        
-        self.mainLayout.addLayout(self.vboxLimit)
+        # --- LÍMITE ---
+        v_limite = QVBoxLayout()
+        self.spin_paginas = SpinBox(self)
+        self.spin_paginas.setRange(0, 1000); self.spin_paginas.setValue(0)
+        v_limite.addWidget(BodyLabel("Límite de páginas (0 = Todo):", self))
+        v_limite.addWidget(self.spin_paginas)
+        self.layout_principal.addLayout(v_limite)
 
-        # --- SECCIÓN MODO (GUARDAR EN) ---
-        self.vboxMode = QVBoxLayout()
-        self.lblMode = BodyLabel("Guardar en:", self) # Texto corregido
-        self.modeCombo = ComboBox(self)
-        self.modeCombo.addItem("En la BD")          # Opción 1
-        self.modeCombo.addItem("En formato json")   # Opción 2
-        self.modeCombo.setCurrentIndex(0)
-        self.vboxMode.addWidget(self.lblMode)
-        self.vboxMode.addWidget(self.modeCombo)
-        
-        self.mainLayout.addLayout(self.vboxMode)
+        # --- MODO ---
+        v_modo = QVBoxLayout()
+        self.combo_modo = ComboBox(self)
+        self.combo_modo.addItem("Guardar en BD")
+        self.combo_modo.addItem("Solo JSON (Debug)")
+        self.combo_modo.setCurrentIndex(0)
+        v_modo.addWidget(BodyLabel("Destino:", self))
+        v_modo.addWidget(self.combo_modo)
+        self.layout_principal.addLayout(v_modo)
 
-        self.mainLayout.addStretch(1) # Empujar botones al fondo
+        self.layout_principal.addStretch(1)
 
         # --- BOTONES ---
-        self.buttonLayout = QHBoxLayout()
-        self.buttonLayout.addStretch(1)
-        
-        self.btnCancel = PushButton("Cancelar", self)
-        self.btnRun = PrimaryPushButton("Ejecutar", self)
-        
-        self.buttonLayout.addWidget(self.btnCancel)
-        self.buttonLayout.addWidget(self.btnRun)
-        
-        self.mainLayout.addLayout(self.buttonLayout)
-
-        # Conexiones
-        self.btnRun.clicked.connect(self.on_accept)
-        self.btnCancel.clicked.connect(self.reject)
+        l_botones = QHBoxLayout(); l_botones.addStretch(1)
+        btn_cancelar = PushButton("Cancelar", self); btn_cancelar.clicked.connect(self.reject)
+        btn_ejecutar = PrimaryPushButton("Ejecutar", self); btn_ejecutar.clicked.connect(self.on_accept)
+        l_botones.addWidget(btn_cancelar); l_botones.addWidget(btn_ejecutar)
+        self.layout_principal.addLayout(l_botones)
 
     @Slot()
     def on_accept(self):
-        logger.debug("Diálogo scraping aceptado.")
-        
-        # Recopilar datos
         try:
-            # .date devuelve un QDate, usamos toPython() para obtener datetime.date
-            date_from = self.dateFromPicker.date.toPython()
-            date_to = self.dateToPicker.date.toPython()
-        except Exception:
-            # Fallback por si la versión de la librería cambia comportamiento
-            date_from = self.dateFromPicker.getDate().toPython()
-            date_to = self.dateToPicker.getDate().toPython()
-
-        max_paginas = self.pageLimitSpin.value()
-        
-        # Mapeo del índice seleccionado al código interno
-        mode_idx = self.modeCombo.currentIndex()
-        mode = "to_db" if mode_idx == 0 else "to_json"
+            f_desde = self.cal_desde.date.toPython()
+            f_hasta = self.cal_hasta.date.toPython()
+        except:
+            f_desde = self.cal_desde.getDate().toPython()
+            f_hasta = self.cal_hasta.getDate().toPython()
 
         config = {
-            "date_from": date_from,
-            "date_to": date_to,
-            "max_paginas": max_paginas,
-            "mode": mode,
+            "date_from": f_desde,
+            "date_to": f_hasta,
+            "max_paginas": self.spin_paginas.value(),
+            "mode": "to_db" if self.combo_modo.currentIndex() == 0 else "to_json",
         }
         
-        self.start_scraping.emit(config)
+        self.senal_iniciar_scraping.emit(config)
         self.accept()

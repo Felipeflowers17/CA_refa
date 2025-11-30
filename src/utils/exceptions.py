@@ -1,34 +1,35 @@
 # -*- coding: utf-8 -*-
 """
-Excepciones Personalizadas de la Aplicación.
+Excepciones Personalizadas del Dominio.
 
-Define tipos de error específicos para el flujo de ETL,
-permitiendo a la GUI saber exactamente qué fase falló.
+Define errores específicos para facilitar la depuración y el manejo
+de fallos en la interfaz gráfica.
 """
 
-class EtlError(Exception):
-    """Clase base para todos los errores de ETL."""
+class ErrorEtl(Exception):
+    """Clase base para todos los errores del proceso ETL."""
     pass
 
-class ScrapingFase1Error(EtlError):
-    """Lanzado si el scraping de listado falla."""
+class ErrorScrapingFase1(ErrorEtl):
+    """Fallo durante la obtención del listado masivo (Fase 1)."""
     pass
 
-class DatabaseLoadError(EtlError):
-    """Lanzado si la carga (Load) de datos crudos a la BD falla."""
+class ErrorCargaBD(ErrorEtl):
+    """Fallo durante la inserción/actualización en base de datos."""
     pass
 
-class DatabaseTransformError(EtlError):
-    """Lanzado si la transformación (Transform) de puntajes falla."""
+class ErrorTransformacionBD(ErrorEtl):
+    """Fallo durante el cálculo de puntajes o transformación de datos."""
     pass
 
-class ScrapingFase2Error(EtlError):
-    """Lanzado si el scraping de fichas de detalle falla."""
+class ErrorScrapingFase2(ErrorEtl):
+    """Fallo durante la extracción de detalle de una ficha (Fase 2)."""
     pass
 
-class RecalculoError(EtlError):
-    """Lanzado si el proceso de recálculo de puntajes falla."""
+class ErrorRecalculo(ErrorEtl):
+    """Fallo durante el proceso manual de recálculo de puntajes."""
     pass
-class ScraperHealthError(Exception):
-    """Error específico para el chequeo de salud del scraper."""
+
+class ErrorSaludScraper(Exception):
+    """Fallo en la verificación de conectividad o sesión del scraper."""
     pass

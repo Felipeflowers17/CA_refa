@@ -1,4 +1,10 @@
 # -*- coding: utf-8 -*-
+"""
+Servicio de Exportación (Excel/CSV).
+
+Gestiona la generación de reportes utilizando Pandas.
+Permite exportar vistas de gestión (pestañas) y copias de seguridad de la BD.
+"""
 import os
 from datetime import datetime
 from pathlib import Path
@@ -9,7 +15,7 @@ import pandas as pd
 # Importamos modelos solo para tipos y referencias de Pandas
 from src.db.db_models import (
     CaLicitacion, CaSector, CaOrganismo, 
-    CaSeguimiento, CaKeyword, CaOrganismoRegla
+    CaSeguimiento, CaPalabraClave, CaOrganismoRegla
 )
 
 if TYPE_CHECKING:
@@ -19,23 +25,23 @@ from src.utils.logger import configurar_logger
 
 logger = configurar_logger(__name__)
 
-class ExcelService:
+class ServicioExcel:
     def __init__(self, db_service: "DbService"):
         self.db_service = db_service
-        logger.info("ExcelService inicializado.")
+        logger.info("ServicioExcel inicializado correctamente.")
 
-    def ejecutar_exportacion_lote(self, lista_tareas: List[Dict], base_path: str) -> List[str]:
+    def ejecutar_exportacion_lote(self, lista_tareas: List[Dict], ruta_base: str) -> List[str]:
         """
-        Ejecuta múltiples exportaciones en una carpeta con timestamp.
+        Ejecuta múltiples tareas de exportación en una carpeta organizada por fecha.
         """
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         
         try:
-            export_root = Path(base_path) / "export"
-            session_folder = export_root / timestamp
-            os.makedirs(session_folder, exist_ok=True)
+            raiz_exportacion = Path(ruta_base) / "export"
+            carpeta_sesion = raiz_exportacion / timestamp
+            os.makedirs(carpeta_sesion, exist_ok=True)
         except Exception as e:
-            return [f"ERROR CRÍTICO: No se pudo crear carpeta en {base_path}: {e}"]
+            return [f"ERROR CRÍTICO: No se pudo crear carpeta en {ruta_base}: {e}"]
 
         resultados = []
         for tarea in lista_tareas:
@@ -43,16 +49,16 @@ class ExcelService:
             formato = tarea.get("format", "excel")
             
             try:
-                ruta = ""
+                ruta_generada = ""
                 if tipo == "tabs":
-                    ruta = self.generar_reporte_pestañas(tarea, session_folder)
+                    ruta_generada = self.generar_reporte_gestion(tarea, carpeta_sesion)
                 elif tipo == "config":
-                    ruta = self.generar_reporte_configuracion(formato, session_folder)
+                    ruta_generada = self.generar_reporte_configuracion(formato, carpeta_sesion)
                 elif tipo == "bd_full":
-                    ruta = self.generar_reporte_bd_completa(formato, session_folder)
+                    ruta_generada = self.generar_backup_bd_completa(formato, carpeta_sesion)
                 
-                if ruta:
-                    resultados.append(f"[{tipo.upper()}] -> {ruta}")
+                if ruta_generada:
+                    resultados.append(f"[{tipo.upper()}] -> {ruta_generada}")
                 else:
                     resultados.append(f"ERROR [{tipo.upper()}] -> Ruta vacía.")
 
@@ -66,7 +72,7 @@ class ExcelService:
         """Convierte lista de diccionarios (del DbService) a DataFrame formateado."""
         datos = []
         for item in datos_dict:
-            # Manejo seguro de fechas para evitar errores en Excel
+            # Manejo seguro de fechas para evitar errores de timezone en Excel
             f_cierre = item.get("fecha_cierre")
             f_cierre_2 = item.get("fecha_cierre_segundo_llamado")
             
@@ -100,38 +106,40 @@ class ExcelService:
             return pd.DataFrame(columns=columnas)
         return pd.DataFrame(datos).reindex(columns=columnas)
 
-    def generar_reporte_pestañas(self, options: dict, target_dir: Path) -> str:
-        formato = options.get("format", "excel")
-        dfs_to_export: Dict[str, pd.DataFrame] = {}
+    def generar_reporte_gestion(self, opciones: dict, directorio_destino: Path) -> str:
+        """Exporta las pestañas principales (Candidatas, Seguimiento, Ofertadas)."""
+        formato = opciones.get("format", "excel")
+        dfs_para_exportar: Dict[str, pd.DataFrame] = {}
 
-        # 1. Obtenemos datos crudos (diccionarios) desde el DbService
-        datos_tab1 = self.db_service.obtener_datos_exportacion_tab1()
-        datos_tab3 = self.db_service.obtener_datos_exportacion_tab3()
-        datos_tab4 = self.db_service.obtener_datos_exportacion_tab4()
+        # 1. Obtenemos datos crudos (diccionarios) usando los nuevos métodos del DbService
+        datos_tab1 = self.db_service.exportar_candidatas()
+        datos_tab3 = self.db_service.exportar_seguimiento()
+        datos_tab4 = self.db_service.exportar_ofertadas()
         
         # 2. Convertimos a DataFrames
-        dfs_to_export["Candidatas"] = self._convertir_a_dataframe(datos_tab1)
-        dfs_to_export["Seguimiento"] = self._convertir_a_dataframe(datos_tab3)
-        dfs_to_export["Ofertadas"] = self._convertir_a_dataframe(datos_tab4)
+        dfs_para_exportar["Candidatas"] = self._convertir_a_dataframe(datos_tab1)
+        dfs_para_exportar["Seguimiento"] = self._convertir_a_dataframe(datos_tab3)
+        dfs_para_exportar["Ofertadas"] = self._convertir_a_dataframe(datos_tab4)
 
-        return self._guardar_archivos(dfs_to_export, formato, "Reporte_Gestion", target_dir)
+        return self._guardar_archivos(dfs_para_exportar, formato, "Reporte_Gestion", directorio_destino)
 
-    def generar_reporte_configuracion(self, formato: str, target_dir: Path) -> str:
+    def generar_reporte_configuracion(self, formato: str, directorio_destino: Path) -> str:
+        """Exporta las reglas de negocio actuales (Auditoría)."""
         logger.info("Exportando Configuración...")
-        dfs_to_export = {}
+        dfs_para_exportar = {}
         
-        # 1. Keywords (Usando DbService, sin sesión manual)
-        keywords = self.db_service.get_all_keywords()
+        # 1. Keywords
+        keywords = self.db_service.obtener_todas_palabras_clave()
         data_kw = [{
             "Keyword": k.keyword,
             "Puntos Nombre": k.puntos_nombre,
             "Puntos Descripcion": k.puntos_descripcion,
             "Puntos Productos": k.puntos_productos
         } for k in keywords]
-        dfs_to_export["Keywords"] = pd.DataFrame(data_kw)
+        dfs_para_exportar["Keywords"] = pd.DataFrame(data_kw)
         
         # 2. Reglas Organismos
-        reglas = self.db_service.get_all_organismo_reglas()
+        reglas = self.db_service.obtener_reglas_organismos()
         data_org = []
         for r in reglas:
             tipo_val = r.tipo.value if hasattr(r.tipo, 'value') else r.tipo
@@ -140,18 +148,17 @@ class ExcelService:
                 "Tipo Regla": tipo_val,
                 "Puntos": r.puntos
             })
-        dfs_to_export["Reglas_Organismos"] = pd.DataFrame(data_org)
+        dfs_para_exportar["Reglas_Organismos"] = pd.DataFrame(data_org)
 
-        return self._guardar_archivos(dfs_to_export, formato, "Configuracion_Reglas", target_dir)
+        return self._guardar_archivos(dfs_para_exportar, formato, "Configuracion_Reglas", directorio_destino)
 
-    def generar_reporte_bd_completa(self, formato: str, target_dir: Path) -> str:
-        """Dump completo de la base de datos (Backup)."""
-        dfs_to_export = {}
-        tablas = [CaLicitacion, CaSeguimiento, CaOrganismo, CaSector, CaKeyword, CaOrganismoRegla]
+    def generar_backup_bd_completa(self, formato: str, directorio_destino: Path) -> str:
+        """Genera un volcado completo de todas las tablas (Backup)."""
+        dfs_para_exportar = {}
+        tablas = [CaLicitacion, CaSeguimiento, CaOrganismo, CaSector, CaPalabraClave, CaOrganismoRegla]
         
         try:
-            # Aquí sí necesitamos una conexión raw para pandas.read_sql
-            # Usamos el session_factory inyectado en DbService
+            # Usamos el session_factory inyectado para obtener conexión cruda para Pandas
             with self.db_service.session_factory() as session:
                 connection = session.connection()
                 for model in tablas:
@@ -164,21 +171,21 @@ class ExcelService:
                             try: df[col] = df[col].dt.tz_localize(None)
                             except: pass
                     
-                    dfs_to_export[table_name] = df
+                    dfs_para_exportar[table_name] = df
         except Exception as e:
             logger.error(f"Error leyendo BD completa: {e}", exc_info=True)
             raise e
             
-        return self._guardar_archivos(dfs_to_export, formato, "Backup_BD_Completa", target_dir)
+        return self._guardar_archivos(dfs_para_exportar, formato, "Backup_BD_Completa", directorio_destino)
 
-    def _guardar_archivos(self, dfs: Dict[str, pd.DataFrame], formato: str, prefijo: str, target_dir: Path) -> str:
+    def _guardar_archivos(self, dfs: Dict[str, pd.DataFrame], formato: str, prefijo: str, directorio_destino: Path) -> str:
         if formato == "excel":
             nombre = f"{prefijo}.xlsx"
-            ruta = target_dir / nombre
+            ruta = directorio_destino / nombre
             try:
                 with pd.ExcelWriter(ruta, engine="openpyxl") as writer:
                     for sheet, df in dfs.items():
-                        safe_sheet = sheet[:30] # Limitación de Excel
+                        safe_sheet = sheet[:30] # Limitación de Excel (31 caracteres)
                         df.to_excel(writer, sheet_name=safe_sheet, index=False)
                 return str(ruta)
             except Exception as e:
@@ -189,9 +196,10 @@ class ExcelService:
             try:
                 for sheet, df in dfs.items():
                     nombre_csv = f"{prefijo}_{sheet}.csv"
-                    ruta_csv = target_dir / nombre_csv
-                    df.to_csv(ruta_csv, index=False, encoding='utf-8-sig', sep=';') # punto y coma para Excel español
-                return str(target_dir) 
+                    ruta_csv = directorio_destino / nombre_csv
+                    # encoding 'utf-8-sig' ayuda a que Excel abra bien los caracteres especiales
+                    df.to_csv(ruta_csv, index=False, encoding='utf-8-sig', sep=';') 
+                return str(directorio_destino) 
             except Exception as e:
                 logger.error(f"Error guardando CSVs: {e}")
                 raise e

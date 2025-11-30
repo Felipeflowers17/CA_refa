@@ -1,70 +1,92 @@
 # -*- coding: utf-8 -*-
+"""
+Servicio de Scraping (Extracción Web).
+
+Implementa una arquitectura híbrida para máxima eficiencia:
+1. Playwright: Se usa brevemente para simular un usuario real y capturar tokens de sesión (Auth).
+2. Requests: Se usa para la descarga masiva de datos usando los tokens capturados.
+"""
 import time
-import random
-import requests # Mucho más rápido que Playwright para peticiones simples
-from playwright.sync_api import sync_playwright, Playwright, Page
+import requests 
+from playwright.sync_api import sync_playwright, Playwright
 from typing import Optional, Dict, Callable, List, Any
 
 from src.utils.logger import configurar_logger
-from . import api_handler
-from .url_builder import construir_url_api_listado, construir_url_api_ficha
-from config.config import MODO_HEADLESS, MAX_RETRIES, DELAY_RETRY, HEADERS_API
+from . import api_handler as manejador_api
+from . import url_builder as constructor_url
+from config.config import MODO_HEADLESS, HEADERS_API
 
 logger = configurar_logger(__name__)
 
-class ScraperService:
+class ServicioScraper:
     def __init__(self):
-        logger.info("ScraperService inicializado.")
+        logger.info("ServicioScraper inicializado.")
+        # Almacenamiento volátil de credenciales
         self.headers_sesion = {} 
         self.cookies_sesion = {}
 
-    def _obtener_credenciales(self, p: Playwright, progress_callback: Callable[[str], None]):
-        """Inicia navegador real para capturar tokens de sesión válidos."""
-        logger.info(f"Iniciando navegador (Headless={MODO_HEADLESS})...")
-        if progress_callback: progress_callback("Obteniendo token de acceso...")
+    def _capturar_credenciales_playwright(self, p: Playwright, callback_progreso: Callable[[str], None]):
+        """
+        Lanza un navegador real (Chrome/Chromium) para navegar al sitio,
+        interceptar el tráfico de red y obtener el token de autorización válido.
+        """
+        logger.info(f"Iniciando captura de credenciales (Headless={MODO_HEADLESS})...")
+        if callback_progreso: 
+            callback_progreso("Obteniendo token de acceso seguro...")
         
-        args = ["--disable-blink-features=AutomationControlled", "--no-sandbox"]
+        # Argumentos para evitar detección de bot
+        args_navegador = ["--disable-blink-features=AutomationControlled", "--no-sandbox"]
         
         try:
-            browser = p.chromium.launch(channel="chrome", headless=MODO_HEADLESS, args=args)
+            # Intentar usar Chrome instalado si es posible
+            browser = p.chromium.launch(channel="chrome", headless=MODO_HEADLESS, args=args_navegador)
         except:
-            browser = p.chromium.launch(headless=MODO_HEADLESS, args=args)
+            # Fallback a Chromium incluido en Playwright
+            browser = p.chromium.launch(headless=MODO_HEADLESS, args=args_navegador)
         
         context = browser.new_context(
             user_agent='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36'
         )
         
         page = context.new_page()
-        headers_capturados = {}
+        credenciales_temp = {}
 
-        def interceptar_request(request):
+        # Listener de tráfico de red
+        def interceptar_peticion(request):
             if "api.buscador" in request.url:
-                h = request.headers
-                if "authorization" in h: headers_capturados['authorization'] = h['authorization']
-                if "x-api-key" in h: headers_capturados['x-api-key'] = h['x-api-key']
+                headers = request.headers
+                if "authorization" in headers: 
+                    credenciales_temp['authorization'] = headers['authorization']
+                if "x-api-key" in headers: 
+                    credenciales_temp['x-api-key'] = headers['x-api-key']
 
-        page.on("request", interceptar_request)
+        page.on("request", interceptar_peticion)
 
         try:
+            # Navegar al sitio
             page.goto("https://buscador.mercadopublico.cl/compra-agil", wait_until="commit", timeout=45000)
             
-            # Espera activa inteligente
-            for i in range(15):
-                if "authorization" in headers_capturados: break
+            # Espera activa inteligente hasta capturar headers
+            for _ in range(15):
+                if "authorization" in credenciales_temp: 
+                    break
                 time.sleep(1)
                 
-            if "authorization" not in headers_capturados:
-                # Intento de forzar carga
-                try: page.get_by_role("button", name="Buscar").click(timeout=2000)
-                except: pass
+            # Si aún no carga, intentamos forzar una interacción
+            if "authorization" not in credenciales_temp:
+                try: 
+                    page.get_by_role("button", name="Buscar").click(timeout=2000)
+                except: 
+                    pass
                 time.sleep(3)
 
-            if "authorization" not in headers_capturados:
-                raise Exception("Token no encontrado tras espera.")
+            if "authorization" not in credenciales_temp:
+                raise Exception("No se pudo interceptar el token de autorización.")
 
+            # Guardamos headers definitivos para uso con requests
             self.headers_sesion = {
-                'authorization': headers_capturados['authorization'],
-                'x-api-key': headers_capturados.get('x-api-key', ''),
+                'authorization': credenciales_temp['authorization'],
+                'x-api-key': credenciales_temp.get('x-api-key', ''),
                 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
                 'accept': 'application/json',
                 'referer': 'https://buscador.mercadopublico.cl/'
@@ -72,89 +94,111 @@ class ScraperService:
             return None 
 
         except Exception as e:
-            logger.error(f"Error credenciales: {e}")
+            logger.error(f"Error crítico obteniendo credenciales: {e}")
             raise e
         finally:
             browser.close()
 
-    def check_session(self, callback=None):
-        """Método público para refrescar sesión si es necesario."""
+    def verificar_sesion(self, callback_progreso=None):
+        """Método público para refrescar la sesión si los headers están vacíos."""
         if not self.headers_sesion:
-            self.refrescar_sesion(callback)
+            self.refrescar_sesion_completa(callback_progreso)
 
-    def refrescar_sesion(self, progress_callback: Callable[[str], None]):
+    def refrescar_sesion_completa(self, callback_progreso: Callable[[str], None]):
+        """Fuerza un ciclo de Playwright para renovar tokens."""
         with sync_playwright() as p:
-            self._obtener_credenciales(p, progress_callback)
+            self._capturar_credenciales_playwright(p, callback_progreso)
 
-    def run_scraper_listado(self, progress_callback: Callable[[str], None], filtros: Optional[Dict] = None, max_paginas: Optional[int] = None) -> List[Dict]:
-        """Fase 1: Obtiene listado masivo usando requests (más rápido una vez tenemos token)."""
-        logger.info(f"INICIANDO FASE 1. Filtros: {filtros}")
+    def ejecutar_scraper_listado(self, callback_progreso: Callable[[str], None], filtros: Optional[Dict] = None, max_paginas: Optional[int] = None) -> List[Dict]:
+        """
+        Fase 1: Descarga masiva de listados.
+        Utiliza 'requests' con los tokens capturados para iterar páginas rápidamente.
+        """
+        logger.info(f"INICIANDO FASE 1. Filtros activos: {filtros}")
         
-        # 1. Asegurar Token
+        # 1. Autenticación (si es necesaria)
         if not self.headers_sesion:
             with sync_playwright() as p:
-                self._obtener_credenciales(p, progress_callback)
+                self._capturar_credenciales_playwright(p, callback_progreso)
         
         todas_las_compras = []
-        current_page = 1
-        total_paginas = 1
+        pagina_actual = 1
+        total_paginas_estimado = 1
         
-        # Usamos requests Session para reutilizar conexión TCP
-        session = requests.Session()
-        session.headers.update(self.headers_sesion)
+        # Sesión HTTP persistente para reutilizar conexión TCP (Keep-Alive)
+        sesion_http = requests.Session()
+        sesion_http.headers.update(self.headers_sesion)
 
         try:
             while True:
-                if max_paginas and current_page > max_paginas: break
-                if total_paginas > 0 and current_page > total_paginas: break
-                if current_page > 300: break # Safety limit
+                # Condiciones de salida
+                if max_paginas and pagina_actual > max_paginas: 
+                    break
+                if total_paginas_estimado > 0 and pagina_actual > total_paginas_estimado: 
+                    break
+                if pagina_actual > 300: # Límite de seguridad
+                    break 
 
-                if progress_callback: progress_callback(f"Descargando página {current_page}...")
+                if callback_progreso: 
+                    callback_progreso(f"Descargando página {pagina_actual}...")
                 
-                url = construir_url_api_listado(current_page, filtros)
+                url = constructor_url.construir_url_api_listado(pagina_actual, filtros)
                 
-                # Request directo
-                resp = session.get(url, timeout=15)
+                # Petición HTTP rápida
+                resp = sesion_http.get(url, timeout=15)
+                
                 if resp.status_code != 200:
-                    logger.warning(f"Error HTTP {resp.status_code} en pág {current_page}")
+                    logger.warning(f"Error HTTP {resp.status_code} leyendo página {pagina_actual}")
+                    # Si falla por 401/403, podría ser token vencido, pero por simplicidad abortamos el loop
                     break
                 
-                datos = resp.json()
-                meta = api_handler.extraer_metadata_paginacion(datos)
-                items = api_handler.extraer_resultados(datos)
+                datos_json = resp.json()
+                meta = manejador_api.extraer_metadata_paginacion(datos_json)
+                items = manejador_api.extraer_resultados_lista(datos_json)
 
-                if current_page == 1:
-                    total_paginas = meta.get('pageCount', 0)
-                    if total_paginas == 0: break
+                # Actualizar total de páginas solo en la primera vuelta
+                if pagina_actual == 1:
+                    total_paginas_estimado = meta.get('total_paginas', 0)
+                    if total_paginas_estimado == 0: 
+                        break
                 
-                if not items: break
+                if not items: 
+                    break
 
                 todas_las_compras.extend(items)
-                current_page += 1
-                time.sleep(0.5) # Politeness delay
+                pagina_actual += 1
+                
+                # Pausa de cortesía para no saturar el servidor
+                time.sleep(0.5)
 
         except Exception as e:
-            logger.error(f"Error scraping listado: {e}")
-            # No lanzamos error fatal para devolver lo que se haya capturado
+            logger.error(f"Excepción durante scraping de listado: {e}")
+            # Retornamos lo que hayamos capturado hasta el error
             
-        # Deduplicación básica por si acaso
+        # Deduplicación de seguridad (por código ID)
         unicas = {c.get('codigo', c.get('id')): c for c in todas_las_compras}
         return list(unicas.values())
 
-    def scrape_ficha_detalle_api(self, _, codigo_ca: str, progress_callback: Callable[[str], None] = None) -> Optional[Dict]:
+    def extraer_detalle_api(self, _, codigo_ca: str, callback_progreso: Callable[[str], None] = None) -> Optional[Dict]:
         """
-        Fase 2: Extrae detalle individual. 
-        Usa 'requests' en lugar de 'page' (Playwright) para máxima velocidad.
+        Fase 2: Extrae el detalle profundo de una licitación específica.
+        Retorna un Diccionario normalizado con los datos de interés o None si falla.
         """
-        url_api = construir_url_api_ficha(codigo_ca)
+        url_api = constructor_url.construir_url_api_ficha(codigo_ca)
         
         try:
-            resp = requests.get(url_api, headers=self.headers_sesion or HEADERS_API, timeout=10)
-            if resp.status_code != 200: return None
+            # Usamos headers de sesión si existen, sino headers genéricos (a veces funciona sin auth)
+            headers = self.headers_sesion or HEADERS_API
+            resp = requests.get(url_api, headers=headers, timeout=10)
+            
+            if resp.status_code != 200: 
+                return None
+            
             datos = resp.json()
         except Exception:
             return None
         
+        # Validación y Extracción
         if datos and datos.get('success') == 'OK' and 'payload' in datos:
             payload = datos['payload']
             
@@ -163,7 +207,7 @@ class ScraperService:
             if not estado_texto and payload.get('motivo_desierta'):
                 estado_texto = "Desierta"
             
-            # Mapeo limpio de datos (Keys deben coincidir con lo que espera DB Service)
+            # Mapeo limpio de datos
             return {
                 'descripcion': payload.get('descripcion'),
                 'direccion_entrega': payload.get('direccion_entrega'),

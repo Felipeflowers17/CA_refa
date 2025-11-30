@@ -1,77 +1,74 @@
 # -*- coding: utf-8 -*-
 """
-Worker de Hilos (QRunnable).
-Este archivo NO DEBE importar nada de 'src.gui.gui_main' ni de 'src.gui.mixins'.
-Solo librerías estándar y utils.
+Trabajador de Hilos (Worker / QRunnable).
+
+Este módulo gestiona la ejecución de tareas pesadas en segundo plano
+para evitar congelar la interfaz gráfica.
 """
 
 from collections.abc import Callable
 from typing import Any
-
 from PySide6.QtCore import QObject, QRunnable, Signal, Slot
-
-# Única dependencia interna permitida: logger
 from src.utils.logger import configurar_logger
 
 logger = configurar_logger(__name__)
 
-
-class WorkerSignals(QObject):
+class SenalesTrabajador(QObject):
     """
-    Define las señales disponibles para un worker.
+    Define las señales que emite un trabajador hacia la GUI.
     """
-    finished = Signal()
+    finalizado = Signal()
     error = Signal(Exception)
-    result = Signal(object)
-    progress = Signal(str)
-    progress_percent = Signal(int) 
+    resultado = Signal(object)
+    progreso_texto = Signal(str)
+    progreso_porcentaje = Signal(int) 
 
-
-class Worker(QRunnable):
+class Trabajador(QRunnable):
     """
-    Worker genérico que hereda de QRunnable.
+    Clase genérica que ejecuta una función en un hilo separado.
     """
 
     def __init__(
         self,
-        task: Callable[..., Any],
-        needs_progress_text: bool,  
-        needs_progress_percent: bool, 
+        tarea: Callable[..., Any],
+        requiere_progreso_texto: bool,  
+        requiere_progreso_porcentaje: bool, 
         *args,
         **kwargs,
     ):
         super().__init__()
-        self.task = task
-        self.needs_progress_text = needs_progress_text
-        self.needs_progress_percent = needs_progress_percent
+        self.tarea = tarea
+        self.requiere_progreso_texto = requiere_progreso_texto
+        self.requiere_progreso_porcentaje = requiere_progreso_porcentaje
         self.args = args
         self.kwargs = kwargs
-        self.signals = WorkerSignals()
+        self.senales = SenalesTrabajador()
 
     @Slot()
     def run(self):
         """
-        El método principal que se ejecuta en el hilo secundario.
+        Método principal ejecutado por QThreadPool.
         """
-        logger.debug(f"Hilo (QRunnable) iniciando tarea: {self.task.__name__}")
+        logger.debug(f"Hilo iniciando tarea: {self.tarea.__name__}")
 
         try:
-            # Inyección Segura por Keyword Arguments (Kwargs)
-            if self.needs_progress_text:
-                self.kwargs['progress_callback_text'] = self.signals.progress.emit
+            # Inyección de Callbacks para reporte de progreso
+            # Esto permite que la lógica de negocio (Backend) actualice la GUI sin conocerla
+            if self.requiere_progreso_texto:
+                self.kwargs['callback_texto'] = self.senales.progreso_texto.emit
             
-            if self.needs_progress_percent:
-                self.kwargs['progress_callback_percent'] = self.signals.progress_percent.emit
+            if self.requiere_progreso_porcentaje:
+                self.kwargs['callback_porcentaje'] = self.senales.progreso_porcentaje.emit
             
-            # Ejecutar la tarea
-            resultado = self.task(*self.args, **self.kwargs)
+            # Ejecutar la lógica de negocio
+            resultado = self.tarea(*self.args, **self.kwargs)
 
             if resultado is not None:
-                self.signals.result.emit(resultado)
+                self.senales.resultado.emit(resultado)
 
         except Exception as e:
-            logger.error(f"Error en el hilo (QRunnable): {e}", exc_info=True)
-            self.signals.error.emit(e)
+            logger.error(f"Excepción en hilo de trabajo: {e}", exc_info=True)
+            self.senales.error.emit(e)
         finally:
-            self.signals.finished.emit()
-            logger.debug(f"Hilo (QRunnable) finalizó tarea: {self.task.__name__}")
+            self.senales.finalizado.emit()
+            logger.debug(f"Hilo finalizó tarea: {self.tarea.__name__}")

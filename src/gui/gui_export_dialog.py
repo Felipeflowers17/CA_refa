@@ -1,48 +1,48 @@
 # -*- coding: utf-8 -*-
 """
-Diálogo de Exportación (Moderno).
+Diálogo de Exportación.
 """
 
 from PySide6.QtCore import Slot
 from qfluentwidgets import MessageBoxBase, SubtitleLabel, RadioButton, BodyLabel
 
-class GuiExportDialog(MessageBoxBase):
-    def __init__(self, current_tab_name: str, parent=None):
+class DialogoExportacion(MessageBoxBase):
+    def __init__(self, nombre_tab_actual: str, parent=None):
         super().__init__(parent)
-        self.current_tab_name = current_tab_name
-        self.titleLabel = SubtitleLabel("Opciones de Exportación", self)
+        self.nombre_tab_actual = nombre_tab_actual
+        self.lbl_titulo = SubtitleLabel("Opciones de Exportación", self)
         
         # Widgets
-        self.lbl_format = BodyLabel("Formato de Archivo:", self)
-        self.radio_excel = RadioButton("Excel (.xlsx)", self)
-        self.radio_csv = RadioButton("CSV (.csv)", self)
-        self.radio_excel.setChecked(True)
+        self.lbl_fmt = BodyLabel("Formato de Archivo:", self)
+        self.rad_excel = RadioButton("Excel (.xlsx)", self)
+        self.rad_csv = RadioButton("CSV (.csv)", self)
+        self.rad_excel.setChecked(True)
         
-        self.lbl_scope = BodyLabel("Alcance:", self)
-        self.radio_all = RadioButton("Todas las pestañas", self)
-        self.radio_curr = RadioButton(f"Solo actual ({current_tab_name})", self)
-        self.radio_all.setChecked(True)
+        self.lbl_alcance = BodyLabel("Alcance:", self)
+        self.rad_todo = RadioButton("Todas las pestañas", self)
+        self.rad_actual = RadioButton(f"Solo actual ({nombre_tab_actual})", self)
+        self.rad_todo.setChecked(True)
         
         # Layout
-        self.viewLayout.addWidget(self.titleLabel)
+        self.viewLayout.addWidget(self.lbl_titulo)
         self.viewLayout.addSpacing(10)
         
-        self.viewLayout.addWidget(self.lbl_format)
-        self.viewLayout.addWidget(self.radio_excel)
-        self.viewLayout.addWidget(self.radio_csv)
+        self.viewLayout.addWidget(self.lbl_fmt)
+        self.viewLayout.addWidget(self.rad_excel)
+        self.viewLayout.addWidget(self.rad_csv)
         
         self.viewLayout.addSpacing(15)
         
-        self.viewLayout.addWidget(self.lbl_scope)
-        self.viewLayout.addWidget(self.radio_all)
-        self.viewLayout.addWidget(self.radio_curr)
+        self.viewLayout.addWidget(self.lbl_alcance)
+        self.viewLayout.addWidget(self.rad_todo)
+        self.viewLayout.addWidget(self.rad_actual)
         
         self.yesButton.setText("Exportar")
         self.cancelButton.setText("Cancelar")
         
-    def get_options(self) -> dict:
+    def obtener_opciones(self) -> dict:
         return {
-            "format": "excel" if self.radio_excel.isChecked() else "csv",
-            "scope": "all" if self.radio_all.isChecked() else "current",
-            "tab_name": self.current_tab_name
+            "format": "excel" if self.rad_excel.isChecked() else "csv",
+            "scope": "all" if self.rad_todo.isChecked() else "current",
+            "tab_name": self.nombre_tab_actual
         }

@@ -1,26 +1,27 @@
 # -*- coding: utf-8 -*-
-from collections import defaultdict
 from PySide6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QScrollArea, QFrame
 )
-from PySide6.QtCore import Qt
 from qfluentwidgets import (
     StrongBodyLabel, BodyLabel, SubtitleLabel, 
     CardWidget, TransparentToolButton, FluentIcon as FIF
 )
-
 from src.db.db_models import CaLicitacion
 
-class DetailDrawer(QWidget):
+class PanelLateralDetalle(QWidget):
+    """
+    Panel deslizante lateral que muestra el detalle completo de una licitación.
+    """
     def __init__(self, parent=None):
         super().__init__(parent)
         self.parent_window = parent
-        self.FixedWidth = 500
+        self.AnchoFijo = 500
         
-        self.setGeometry(0, 0, self.FixedWidth, parent.height())
+        # Posición inicial (oculto)
+        self.setGeometry(0, 0, self.AnchoFijo, parent.height())
         
         self.setStyleSheet("""
-            DetailDrawer {
+            PanelLateralDetalle {
                 background-color: #f3f3f3;
                 border-left: 1px solid #d0d0d0;
             }
@@ -28,10 +29,10 @@ class DetailDrawer(QWidget):
                 background-color: transparent;
                 border: none;
             }
-            QWidget#ContentWidget {
+            QWidget#WidgetContenido {
                 background-color: transparent;
             }
-            CardWidget#MainSheet {
+            CardWidget#TarjetaPrincipal {
                 background-color: #ffffff;
                 border: 1px solid #e0e0e0;
                 border-radius: 8px;
@@ -39,176 +40,176 @@ class DetailDrawer(QWidget):
         """)
         self.hide() 
 
-        self.mainLayout = QVBoxLayout(self)
-        self.mainLayout.setContentsMargins(0, 0, 0, 0)
-        self.mainLayout.setSpacing(0)
+        self.layout_principal = QVBoxLayout(self)
+        self.layout_principal.setContentsMargins(0, 0, 0, 0)
+        self.layout_principal.setSpacing(0)
 
-        # Header
-        self.headerFrame = QFrame()
-        self.headerFrame.setStyleSheet("background-color: #ffffff; border-bottom: 1px solid #e5e5e5;")
-        self.headerLayout = QHBoxLayout(self.headerFrame)
-        self.headerLayout.setContentsMargins(20, 15, 20, 15)
+        # Encabezado
+        self.frame_header = QFrame()
+        self.frame_header.setStyleSheet("background-color: #ffffff; border-bottom: 1px solid #e5e5e5;")
+        self.layout_header = QHBoxLayout(self.frame_header)
+        self.layout_header.setContentsMargins(20, 15, 20, 15)
         
-        self.titleLabel = SubtitleLabel("Detalle de Licitación", self)
-        self.btnClose = TransparentToolButton(FIF.CLOSE, self)
-        self.btnClose.clicked.connect(self.close_drawer)
+        self.lbl_titulo = SubtitleLabel("Ficha de Licitación", self)
+        self.btn_cerrar = TransparentToolButton(FIF.CLOSE, self)
+        self.btn_cerrar.clicked.connect(self.cerrar_panel)
         
-        self.headerLayout.addWidget(self.titleLabel)
-        self.headerLayout.addStretch(1)
-        self.headerLayout.addWidget(self.btnClose)
+        self.layout_header.addWidget(self.lbl_titulo)
+        self.layout_header.addStretch(1)
+        self.layout_header.addWidget(self.btn_cerrar)
         
-        self.mainLayout.addWidget(self.headerFrame)
+        self.layout_principal.addWidget(self.frame_header)
 
-        # Scroll
-        self.scrollArea = QScrollArea()
-        self.scrollArea.setWidgetResizable(True)
+        # Área de Scroll
+        self.area_scroll = QScrollArea()
+        self.area_scroll.setWidgetResizable(True)
         
-        self.contentWidget = QWidget()
-        self.contentWidget.setObjectName("ContentWidget")
-        self.contentLayout = QVBoxLayout(self.contentWidget)
-        self.contentLayout.setContentsMargins(20, 20, 20, 20)
+        self.widget_contenido = QWidget()
+        self.widget_contenido.setObjectName("WidgetContenido")
+        self.layout_contenido = QVBoxLayout(self.widget_contenido)
+        self.layout_contenido.setContentsMargins(20, 20, 20, 20)
         
-        self.scrollArea.setWidget(self.contentWidget)
-        self.mainLayout.addWidget(self.scrollArea)
+        self.area_scroll.setWidget(self.widget_contenido)
+        self.layout_principal.addWidget(self.area_scroll)
 
-        self._init_unified_sheet()
+        self._inicializar_tarjeta_unica()
 
-    def _init_unified_sheet(self):
-        self.mainSheet = CardWidget(self)
-        self.mainSheet.setObjectName("MainSheet")
-        self.sheetLayout = QVBoxLayout(self.mainSheet)
-        self.sheetLayout.setContentsMargins(24, 24, 24, 24)
-        self.sheetLayout.setSpacing(16)
+    def _inicializar_tarjeta_unica(self):
+        self.tarjeta_info = CardWidget(self)
+        self.tarjeta_info.setObjectName("TarjetaPrincipal")
+        self.layout_tarjeta = QVBoxLayout(self.tarjeta_info)
+        self.layout_tarjeta.setContentsMargins(24, 24, 24, 24)
+        self.layout_tarjeta.setSpacing(16)
         
-        # Secciones
-        self._add_section_title("Información General")
-        self.lblCodigo = self._add_field("Código:", "", vertical=False)
-        self.lblNombre = self._add_field("Nombre:", "", vertical=True)
-        self.lblEstado = self._add_field("Estado:", "", vertical=False)
+        # --- Secciones ---
+        self._agregar_titulo_seccion("Información General")
+        self.val_codigo = self._agregar_campo("Código:", "", vertical=False)
+        self.val_nombre = self._agregar_campo("Nombre:", "", vertical=True)
+        self.val_estado = self._agregar_campo("Estado:", "", vertical=False)
         
-        self._add_separator()
+        self._agregar_separador()
         
-        self._add_section_title("Plazos y Montos")
-        self.lblFechaPub = self._add_field("Publicación:", "", vertical=False)
-        self.lblFechaCierre = self._add_field("Cierre:", "", vertical=False)
-        self.lblFechaCierre2 = self._add_field("Cierre 2° Llamado:", "", vertical=False)
-        # Se movio Plazo de entrega a la siguiente sección
-        self.lblMonto = self._add_field("Monto:", "", vertical=False)
-        self.lblProveedores = self._add_field("Proveedores:", "", vertical=False)
+        self._agregar_titulo_seccion("Plazos y Presupuesto")
+        self.val_fecha_pub = self._agregar_campo("Publicación:", "", vertical=False)
+        self.val_fecha_cierre = self._agregar_campo("Cierre:", "", vertical=False)
+        self.val_fecha_cierre2 = self._agregar_campo("Cierre 2° Llamado:", "", vertical=False)
+        self.val_monto = self._agregar_campo("Monto:", "", vertical=False)
+        self.val_proveedores = self._agregar_campo("Proveedores:", "", vertical=False)
 
-        self._add_separator()
+        self._agregar_separador()
 
-        self._add_section_title("Descripción y Entrega")
-        self.lblOrganismo = self._add_field("Organismo:", "", vertical=True)
-        self.lblDireccion = self._add_field("Dirección Entrega:", "", vertical=True)
-        self.lblPlazoEntrega = self._add_field("Plazo de entrega:", "", vertical=False) # <--- AQUI ESTA AHORA
+        self._agregar_titulo_seccion("Entrega y Ubicación")
+        self.val_organismo = self._agregar_campo("Organismo:", "", vertical=True)
+        self.val_direccion = self._agregar_campo("Dirección:", "", vertical=True)
+        self.val_plazo_entrega = self._agregar_campo("Plazo de entrega:", "", vertical=False)
         
-        self.sheetLayout.addWidget(StrongBodyLabel("Descripción completa:", self))
-        self.lblDescTexto = BodyLabel("", self)
-        self.lblDescTexto.setWordWrap(True)
-        self.lblDescTexto.setStyleSheet("color: #333;")
-        self.sheetLayout.addWidget(self.lblDescTexto)
+        self.layout_tarjeta.addWidget(StrongBodyLabel("Descripción Técnica:", self))
+        self.val_descripcion = BodyLabel("", self)
+        self.val_descripcion.setWordWrap(True)
+        self.val_descripcion.setStyleSheet("color: #333;")
+        self.layout_tarjeta.addWidget(self.val_descripcion)
 
-        self._add_separator()
+        self._agregar_separador()
 
-        self._add_section_title("Productos Solicitados")
-        self.productsLayout = QVBoxLayout()
-        self.productsLayout.setSpacing(8)
-        self.sheetLayout.addLayout(self.productsLayout)
+        self._agregar_titulo_seccion("Productos Requeridos")
+        self.layout_productos = QVBoxLayout()
+        self.layout_productos.setSpacing(8)
+        self.layout_tarjeta.addLayout(self.layout_productos)
 
-        self.contentLayout.addWidget(self.mainSheet)
-        self.contentLayout.addStretch(1)
+        self.layout_contenido.addWidget(self.tarjeta_info)
+        self.layout_contenido.addStretch(1)
 
-    def _add_section_title(self, title):
-        lbl = StrongBodyLabel(title, self)
+    def _agregar_titulo_seccion(self, texto):
+        lbl = StrongBodyLabel(texto, self)
         lbl.setStyleSheet("font-size: 16px; color: #005fb8;")
-        self.sheetLayout.addWidget(lbl)
+        self.layout_tarjeta.addWidget(lbl)
 
-    def _add_separator(self):
-        line = QFrame()
-        line.setFrameShape(QFrame.HLine)
-        line.setFrameShadow(QFrame.Sunken)
-        line.setStyleSheet("background-color: #e0e0e0; margin-top: 8px; margin-bottom: 8px;")
-        self.sheetLayout.addWidget(line)
+    def _agregar_separador(self):
+        linea = QFrame()
+        linea.setFrameShape(QFrame.HLine)
+        linea.setFrameShadow(QFrame.Sunken)
+        linea.setStyleSheet("background-color: #e0e0e0; margin-top: 8px; margin-bottom: 8px;")
+        self.layout_tarjeta.addWidget(linea)
 
-    def _add_field(self, label_text, value_text, vertical=False):
-        container = QWidget()
+    def _agregar_campo(self, etiqueta, valor, vertical=False):
+        contenedor = QWidget()
         if vertical:
-            layout = QVBoxLayout(container); layout.setSpacing(2)
+            l = QVBoxLayout(contenedor); l.setSpacing(2)
         else:
-            layout = QHBoxLayout(container); layout.setSpacing(10)
-        layout.setContentsMargins(0, 0, 0, 0)
+            l = QHBoxLayout(contenedor); l.setSpacing(10)
+        l.setContentsMargins(0, 0, 0, 0)
         
-        lbl = BodyLabel(label_text, self)
+        lbl = BodyLabel(etiqueta, self)
         lbl.setStyleSheet("color: #666; font-weight: 500;")
-        val = BodyLabel(value_text, self)
+        val = BodyLabel(valor, self)
         val.setWordWrap(True)
         val.setStyleSheet("color: #000; font-weight: 400;")
 
-        layout.addWidget(lbl)
-        if not vertical: layout.addWidget(val); layout.addStretch(1)
-        else: layout.addWidget(val)
+        l.addWidget(lbl)
+        if not vertical: 
+            l.addWidget(val); l.addStretch(1)
+        else: 
+            l.addWidget(val)
         
-        self.sheetLayout.addWidget(container)
+        self.layout_tarjeta.addWidget(contenedor)
         return val
 
-    def _clear_products_layout(self):
-        while self.productsLayout.count():
-            child = self.productsLayout.takeAt(0)
-            if child.widget(): child.widget().deleteLater()
+    def _limpiar_productos(self):
+        while self.layout_productos.count():
+            item = self.layout_productos.takeAt(0)
+            if item.widget(): item.widget().deleteLater()
 
-    def _create_product_row(self, nombre, descripcion, cantidad, unidad):
+    def _crear_fila_producto(self, nombre, descripcion, cantidad, unidad):
         frame = QFrame()
         frame.setStyleSheet("background-color: #f9f9f9; border: 1px solid #e0e0e0; border-radius: 6px;")
         layout = QVBoxLayout(frame); layout.setContentsMargins(10, 10, 10, 10)
         
-        topRow = QHBoxLayout()
-        nameLbl = StrongBodyLabel(nombre, frame); nameLbl.setStyleSheet("border: none; font-size: 13px;"); nameLbl.setWordWrap(True)
-        qtyLbl = StrongBodyLabel(f"{cantidad} {unidad}", frame); qtyLbl.setStyleSheet("background-color: #e0f2f1; color: #00695c; border: none; border-radius: 4px; padding: 2px 6px;")
+        fila_sup = QHBoxLayout()
+        lbl_nom = StrongBodyLabel(nombre, frame); lbl_nom.setStyleSheet("border: none; font-size: 13px;"); lbl_nom.setWordWrap(True)
+        lbl_cant = StrongBodyLabel(f"{cantidad} {unidad}", frame); lbl_cant.setStyleSheet("background-color: #e0f2f1; color: #00695c; border: none; border-radius: 4px; padding: 2px 6px;")
         
-        topRow.addWidget(nameLbl, stretch=1); topRow.addWidget(qtyLbl)
-        layout.addLayout(topRow)
+        fila_sup.addWidget(lbl_nom, stretch=1); fila_sup.addWidget(lbl_cant)
+        layout.addLayout(fila_sup)
         
         if descripcion and descripcion.strip():
-            descLbl = BodyLabel(descripcion, frame); descLbl.setWordWrap(True)
-            descLbl.setStyleSheet("color: #555; border: none; font-size: 12px; margin-top: 4px;")
-            layout.addWidget(descLbl)
+            lbl_desc = BodyLabel(descripcion, frame); lbl_desc.setWordWrap(True)
+            lbl_desc.setStyleSheet("color: #555; border: none; font-size: 12px; margin-top: 4px;")
+            layout.addWidget(lbl_desc)
         return frame
 
     def set_data(self, licitacion: CaLicitacion):
-        self.lblCodigo.setText(licitacion.codigo_ca)
-        self.lblNombre.setText(licitacion.nombre)
+        """Puebla el panel con los datos de un objeto CaLicitacion."""
+        self.val_codigo.setText(licitacion.codigo_ca)
+        self.val_nombre.setText(licitacion.nombre)
         
-        est = licitacion.estado_ca_texto or "N/A"
-        if licitacion.estado_convocatoria == 2: est += " (2° Llamado)"
-        self.lblEstado.setText(est)
+        estado = licitacion.estado_ca_texto or "N/A"
+        if licitacion.estado_convocatoria == 2: estado += " (2° Llamado)"
+        self.val_estado.setText(estado)
         
         f_pub = licitacion.fecha_publicacion.strftime("%d-%m-%Y %H:%M") if licitacion.fecha_publicacion else "-"
         f_cierre = licitacion.fecha_cierre.strftime("%d-%m-%Y %H:%M") if licitacion.fecha_cierre else "-"
         f_cierre2 = licitacion.fecha_cierre_segundo_llamado.strftime("%d-%m-%Y %H:%M") if licitacion.fecha_cierre_segundo_llamado else "No aplica"
         
-        self.lblFechaPub.setText(f_pub)
-        self.lblFechaCierre.setText(f_cierre)
-        self.lblFechaCierre2.setText(f_cierre2)
+        self.val_fecha_pub.setText(f_pub)
+        self.val_fecha_cierre.setText(f_cierre)
+        self.val_fecha_cierre2.setText(f_cierre2)
         
-        # Formato de dias
+        # Plazo entrega
         if licitacion.plazo_entrega is not None: 
-            if licitacion.plazo_entrega == 1:
-                self.lblPlazoEntrega.setText("1 día")
-            else:
-                self.lblPlazoEntrega.setText(f"{licitacion.plazo_entrega} días")
+            self.val_plazo_entrega.setText(f"{licitacion.plazo_entrega} días")
         else: 
-            self.lblPlazoEntrega.setText("No especificado")
+            self.val_plazo_entrega.setText("No especificado")
         
-        m = licitacion.monto_clp or 0
-        self.lblMonto.setText(f"$ {int(m):,}".replace(",", "."))
-        self.lblProveedores.setText(str(licitacion.proveedores_cotizando or 0))
+        monto = licitacion.monto_clp or 0
+        self.val_monto.setText(f"$ {int(monto):,}".replace(",", "."))
+        self.val_proveedores.setText(str(licitacion.proveedores_cotizando or 0))
         
-        self.lblOrganismo.setText(licitacion.organismo.nombre if licitacion.organismo else "N/A")
-        self.lblDireccion.setText(licitacion.direccion_entrega or "No especificada")
-        self.lblDescTexto.setText(licitacion.descripcion or "Sin descripción.")
+        self.val_organismo.setText(licitacion.organismo.nombre if licitacion.organismo else "N/A")
+        self.val_direccion.setText(licitacion.direccion_entrega or "No especificada")
+        self.val_descripcion.setText(licitacion.descripcion or "Sin descripción.")
         
-        self._clear_products_layout()
+        # Productos
+        self._limpiar_productos()
         prods = licitacion.productos_solicitados
         if prods and isinstance(prods, list):
             for p in prods:
@@ -219,9 +220,9 @@ class DetailDrawer(QWidget):
                     cv = float(p.get('cantidad', 0))
                     ct = f"{int(cv)}" if cv.is_integer() else f"{cv:.2f}"
                 except: ct = "0"
-                self.productsLayout.addWidget(self._create_product_row(nm, ds, ct, un))
+                self.layout_productos.addWidget(self._crear_fila_producto(nm, ds, ct, un))
         else:
-            self.productsLayout.addWidget(BodyLabel("No hay detalle de productos.", self))
+            self.layout_productos.addWidget(BodyLabel("No hay detalle de productos.", self))
 
     def open_drawer(self): self.raise_(); self.show()
-    def close_drawer(self): self.hide()
+    def cerrar_panel(self): self.hide()

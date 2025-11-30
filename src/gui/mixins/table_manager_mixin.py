@@ -9,7 +9,7 @@ COLUMN_HEADERS = [
     "Fecha Pub.", "Fecha Cierre", "Monto", "Nota"
 ]
 
-class TableManagerMixin:
+class MixinGestorTabla:
     def crear_tabla_view(self, model, object_name):
         table = QTableView(self)
         table.setObjectName(object_name)
@@ -41,17 +41,18 @@ class TableManagerMixin:
         table.setSortingEnabled(True)
         table.setContextMenuPolicy(Qt.CustomContextMenu)
 
-        # Importación tardía para evitar ciclos si 'delegates.py' importa algo de GUI
-        from src.gui.delegates import ElidedTextDelegate
-        table.setItemDelegateForColumn(1, ElidedTextDelegate(table))
-        table.setItemDelegateForColumn(2, ElidedTextDelegate(table))
+        from src.gui.delegates import DelegadoTextoElidido
+        table.setItemDelegateForColumn(1, DelegadoTextoElidido(table))
+        table.setItemDelegateForColumn(2, DelegadoTextoElidido(table))
+
         
         return table
 
-    def poblar_tabla(self, model, data_list):
+    def poblar_tabla_generica(self, model, lista_datos):
+        """Llena un QStandardItemModel con objetos CaLicitacion."""
         model.removeRows(0, model.rowCount())
         
-        for data in data_list:
+        for data in lista_datos:
             # 1. Score
             score = getattr(data, 'puntuacion_final', 0)
             item_score = QStandardItem(str(score))

@@ -1,30 +1,32 @@
 # -*- coding: utf-8 -*-
+"""
+Punto de Entrada de la Aplicación (Modo Producción).
+"""
 import sys
 import os
 import subprocess
 from pathlib import Path
 
-
+# Configuración específica para Windows y Playwright en modo ejecutable
 if sys.platform == 'win32':
     local_app_data = os.getenv('LOCALAPPDATA')
     if local_app_data:
         os.environ["PLAYWRIGHT_BROWSERS_PATH"] = os.path.join(local_app_data, 'ms-playwright')
-# -----------------------------------
 
-# Configuración del Path para PyInstaller
+# Rutas para PyInstaller (Detecta si corre como script o como .exe)
 if getattr(sys, 'frozen', False):
-    BASE_DIR = Path(sys.executable).resolve().parent
-    ROOT_DIR = Path(sys._MEIPASS)
+    DIR_BASE = Path(sys.executable).resolve().parent
+    DIR_RAIZ = Path(sys._MEIPASS)
 else:
-    BASE_DIR = Path(__file__).resolve().parent.parent
-    ROOT_DIR = Path(__file__).resolve().parent
+    DIR_BASE = Path(__file__).resolve().parent.parent
+    DIR_RAIZ = Path(__file__).resolve().parent
 
-if str(BASE_DIR) not in sys.path:
-    sys.path.append(str(BASE_DIR))
+if str(DIR_BASE) not in sys.path:
+    sys.path.append(str(DIR_BASE))
 
-from PySide6.QtWidgets import QApplication, QSplashScreen
+from PySide6.QtWidgets import QApplication, QSplashScreen, QMessageBox
 from PySide6.QtCore import Qt, QCoreApplication
-from PySide6.QtGui import QPixmap, QFont
+from PySide6.QtGui import QFont
 
 from src.utils.logger import configurar_logger
 from config.config import DATABASE_URL
@@ -34,67 +36,71 @@ from alembic.command import upgrade
 
 logger = configurar_logger("run_app")
 
-def check_playwright_browsers():
+# --- FUNCIONES AUXILIARES ---
+
+def verificar_navegadores_playwright():
     """
     Verifica e instala los navegadores de Playwright si no existen.
-    Crítico para el primer uso del .exe en un equipo limpio.
+    Silencioso en producción a menos que haya error crítico.
     """
     try:
         logger.info("Verificando entorno de navegadores Playwright...")
         # Solo forzamos la instalación si estamos en modo compilado (.exe)
         if getattr(sys, 'frozen', False):
-            # Intentamos ejecutar la instalación pasando el entorno modificado
             subprocess.run(["playwright", "install", "chromium"], check=True, env=os.environ)
             logger.info("Navegadores verificados correctamente.")
     except Exception as e:
         logger.error(f"Error verificando navegadores: {e}")
         # No lanzamos error fatal para permitir que la app intente arrancar
 
-def run_migrations():
-    logger.info("Verificando estado de la base de datos...")
+def ejecutar_migraciones_bd():
+    """Ejecuta Alembic para asegurar que la BD tenga las tablas al día."""
+    logger.info("Verificando esquema de base de datos...")
     try:
-        if getattr(sys, 'frozen', False):
-            alembic_cfg_path = ROOT_DIR / "alembic.ini"
-            script_location = ROOT_DIR / "alembic"
-        else:
-            alembic_cfg_path = ROOT_DIR / "alembic.ini"
-            script_location = ROOT_DIR / "alembic"
+        archivo_alembic = DIR_RAIZ / "alembic.ini"
+        ubicacion_scripts = DIR_RAIZ / "alembic"
 
-        if not alembic_cfg_path.exists():
-            logger.error(f"No se encontró alembic.ini en: {alembic_cfg_path}")
+        if not archivo_alembic.exists():
+            logger.error(f"No se encontró configuración de Alembic en: {archivo_alembic}")
             return
 
-        alembic_cfg = Config(str(alembic_cfg_path))
-        alembic_cfg.set_main_option("script_location", str(script_location))
-        alembic_cfg.set_main_option("sqlalchemy.url", DATABASE_URL)
+        cfg_alembic = Config(str(archivo_alembic))
+        cfg_alembic.set_main_option("script_location", str(ubicacion_scripts))
+        cfg_alembic.set_main_option("sqlalchemy.url", DATABASE_URL)
 
-        upgrade(alembic_cfg, "head")
-        logger.info("BD actualizada correctamente.")
+        upgrade(cfg_alembic, "head")
+        logger.info("Base de datos sincronizada correctamente.")
 
     except Exception as e:
-        logger.critical(f"Error al ejecutar migraciones: {e}", exc_info=True)
+        logger.critical(f"Error fatal al ejecutar migraciones: {e}", exc_info=True)
+
+
+# --- MAIN PRINCIPAL ---
 
 def main():
     app = QApplication(sys.argv)
+    
+
     font = QFont("Segoe UI", 10)
     app.setFont(font)
     app.setQuitOnLastWindowClosed(False)
 
+    # 1. Mostrar Pantalla de Carga 
     splash = QSplashScreen()
-    splash.showMessage("Iniciando Monitor CA...", Qt.AlignBottom | Qt.AlignCenter, Qt.black)
+    splash.showMessage("Iniciando Monitor de Compras...", Qt.AlignBottom | Qt.AlignCenter, Qt.black)
     splash.show()
     
+    # Procesa eventos para asegurar que la imagen se pinte
     QCoreApplication.processEvents()
 
-    # 1. Verificar Navegadores (Playwright)
+    # 2. Tareas de Inicialización (Actualizando el mensaje del Splash)
     splash.showMessage("Verificando componentes web...", Qt.AlignBottom | Qt.AlignCenter, Qt.black)
     QCoreApplication.processEvents()
-    check_playwright_browsers()
+    verificar_navegadores_playwright()
 
-    # 2. Ejecutar Migraciones (Base de Datos)
     splash.showMessage("Conectando a Base de Datos...", Qt.AlignBottom | Qt.AlignCenter, Qt.black)
     QCoreApplication.processEvents()
-    run_migrations()
+    ejecutar_migraciones_bd()
     
     splash.showMessage("Cargando Interfaz...", Qt.AlignBottom | Qt.AlignCenter, Qt.black)
     QCoreApplication.processEvents()
@@ -102,13 +108,19 @@ def main():
     # 3. Iniciar GUI Principal
     try:
         from src.gui.gui_main import MainWindow
-        window = MainWindow()
-        window.show()
-        splash.finish(window)
+        ventana = MainWindow()
+        ventana.show()
+        
+        # Cierra el splash cuando la ventana principal aparece
+        splash.finish(ventana)
+        
         sys.exit(app.exec())
+        
     except Exception as e:
         logger.critical(f"Error fatal no manejado en la GUI: {e}", exc_info=True)
-        print(f"Error Fatal: {e}")
+        # En caso de error catastrófico que impida abrir la ventana, mostramos un mensaje nativo
+        QMessageBox.critical(None, "Error Fatal", f"La aplicación no pudo iniciarse.\nRevise los logs.\nError: {e}")
+        sys.exit(1)
 
 if __name__ == "__main__":
     main()
