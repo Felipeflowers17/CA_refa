@@ -42,6 +42,7 @@ class CaOrganismo(Base):
     organismo_id: Mapped[int] = mapped_column(Integer, primary_key=True)
     nombre: Mapped[str] = mapped_column(String(1000), unique=True, index=True)
     sector_id: Mapped[int] = mapped_column(ForeignKey("ca_sector.sector_id"))
+    es_nuevo: Mapped[bool] = mapped_column(Boolean, default=True)
     
     # Relaciones
     sector: Mapped["CaSector"] = relationship(back_populates="organismos", lazy="joined")
@@ -130,6 +131,7 @@ class TipoReglaOrganismo(enum.Enum):
     """Enumeración para los tipos de reglas aplicables a organismos."""
     PRIORITARIO = 'prioritario'
     NO_DESEADO = 'no_deseado'
+    NEUTRO = 'neutro'
 
 class CaOrganismoRegla(Base):
     """

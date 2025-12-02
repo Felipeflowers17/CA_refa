@@ -53,7 +53,7 @@ class Trabajador(QRunnable):
 
         try:
             # Inyección de Callbacks para reporte de progreso
-            # Esto permite que la lógica de negocio (Backend) actualice la GUI sin conocerla
+            # Esto permite que la lógica de negocio (Backend) actualice la GUI 
             if self.requiere_progreso_texto:
                 self.kwargs['callback_texto'] = self.senales.progreso_texto.emit
             

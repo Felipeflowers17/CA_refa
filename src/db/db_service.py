@@ -61,7 +61,7 @@ class DbService:
                 session.flush()
             
             # Inserción masiva de nuevos organismos
-            nuevos_orgs = [{"nombre": nombre, "sector_id": sector_default.sector_id} for nombre in faltantes]
+            nuevos_orgs = [{"nombre": nombre, "sector_id": sector_default.sector_id, "es_nuevo": True} for nombre in faltantes]
             session.execute(insert(CaOrganismo), nuevos_orgs)
             
             # Recuperar los IDs recién creados
@@ -310,15 +310,25 @@ class DbService:
         """Obtiene datos ligeros de todas las licitaciones para recalcular puntajes."""
         with self.session_factory() as session:
             stmt = select(
-                CaLicitacion.ca_id, CaLicitacion.codigo_ca, CaLicitacion.nombre,
-                CaLicitacion.estado_ca_texto, CaLicitacion.descripcion, CaLicitacion.productos_solicitados,
+                CaLicitacion.ca_id, 
+                CaLicitacion.codigo_ca, 
+                CaLicitacion.nombre,
+                CaLicitacion.estado_ca_texto, 
+                CaLicitacion.descripcion, 
+                CaLicitacion.productos_solicitados,
+                CaLicitacion.puntuacion_final, 
                 CaOrganismo.nombre.label("organismo_nombre")
             ).outerjoin(CaOrganismo, CaLicitacion.organismo_id == CaOrganismo.organismo_id)
             rows = session.execute(stmt).all()
             return [{
-                "ca_id": r.ca_id, "codigo_ca": r.codigo_ca, "nombre": r.nombre,
-                "estado_ca_texto": r.estado_ca_texto, "organismo_nombre": r.organismo_nombre or "",
-                "descripcion": r.descripcion, "productos_solicitados": r.productos_solicitados
+                "ca_id": r.ca_id, 
+                "codigo_ca": r.codigo_ca, 
+                "nombre": r.nombre,
+                "estado_ca_texto": r.estado_ca_texto, 
+                "organismo_nombre": r.organismo_nombre or "",
+                "descripcion": r.descripcion, 
+                "productos_solicitados": r.productos_solicitados,
+                "puntuacion_final_actual": r.puntuacion_final or 0 
             } for r in rows]
 
     def obtener_candidatas_para_fase_2(self, umbral_minimo: int = 10) -> List[CaLicitacion]:
@@ -444,6 +454,22 @@ class DbService:
                 session.commit()
             except Exception as e: 
                 logger.error(f"Error guardando nota {ca_id}: {e}")
+                session.rollback()
+
+    def marcar_organismos_como_vistos(self):
+        """
+        Rutina de mantenimiento:
+        Toma todos los organismos marcados como 'Nuevos' y los pasa a estado normal (Visto).
+        Se ejecuta al inicio de cada scraping para 'limpiar' la bandeja de pendientes.
+        """
+        with self.session_factory() as session:
+            try:
+                # Actualizar todos los que tengan es_nuevo=True a False
+                stmt = update(CaOrganismo).where(CaOrganismo.es_nuevo == True).values(es_nuevo=False)
+                session.execute(stmt)
+                session.commit()
+            except Exception as e:
+                logger.error(f"Error reseteando organismos nuevos: {e}")
                 session.rollback()
 
     # --- CONFIGURACIÓN DE REGLAS ---

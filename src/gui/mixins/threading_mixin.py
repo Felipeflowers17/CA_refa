@@ -44,7 +44,6 @@ class MixinHilos:
         try:
             trabajador = Trabajador(task, necesita_texto, necesita_porcentaje, *task_args, **task_kwargs)
             
-            # CRÍTICO: Evita que C++ borre el objeto antes de emitir señales
             trabajador.setAutoDelete(False) 
             
             # Conexión de señales 
