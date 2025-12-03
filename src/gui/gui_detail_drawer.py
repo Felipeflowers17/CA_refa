@@ -2,6 +2,7 @@
 from PySide6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QScrollArea, QFrame
 )
+from PySide6.QtCore import Qt
 from qfluentwidgets import (
     StrongBodyLabel, BodyLabel, SubtitleLabel, 
     CardWidget, TransparentToolButton, FluentIcon as FIF
@@ -17,7 +18,6 @@ class PanelLateralDetalle(QWidget):
         self.parent_window = parent
         self.AnchoFijo = 500
         
-        # Posición inicial (oculto)
         self.setGeometry(0, 0, self.AnchoFijo, parent.height())
         
         self.setStyleSheet("""
@@ -107,6 +107,8 @@ class PanelLateralDetalle(QWidget):
         self.val_descripcion = BodyLabel("", self)
         self.val_descripcion.setWordWrap(True)
         self.val_descripcion.setStyleSheet("color: #333;")
+        # Habilitar selección en descripción
+        self.val_descripcion.setTextInteractionFlags(Qt.TextSelectableByMouse)
         self.layout_tarjeta.addWidget(self.val_descripcion)
 
         self._agregar_separador()
@@ -144,6 +146,9 @@ class PanelLateralDetalle(QWidget):
         val = BodyLabel(valor, self)
         val.setWordWrap(True)
         val.setStyleSheet("color: #000; font-weight: 400;")
+        
+        # HABILITAR SELECCIÓN DE TEXTO
+        val.setTextInteractionFlags(Qt.TextSelectableByMouse)
 
         l.addWidget(lbl)
         if not vertical: 
@@ -166,6 +171,9 @@ class PanelLateralDetalle(QWidget):
         
         fila_sup = QHBoxLayout()
         lbl_nom = StrongBodyLabel(nombre, frame); lbl_nom.setStyleSheet("border: none; font-size: 13px;"); lbl_nom.setWordWrap(True)
+        # Habilitar selección en nombre producto
+        lbl_nom.setTextInteractionFlags(Qt.TextSelectableByMouse)
+        
         lbl_cant = StrongBodyLabel(f"{cantidad} {unidad}", frame); lbl_cant.setStyleSheet("background-color: #e0f2f1; color: #00695c; border: none; border-radius: 4px; padding: 2px 6px;")
         
         fila_sup.addWidget(lbl_nom, stretch=1); fila_sup.addWidget(lbl_cant)
@@ -174,6 +182,8 @@ class PanelLateralDetalle(QWidget):
         if descripcion and descripcion.strip():
             lbl_desc = BodyLabel(descripcion, frame); lbl_desc.setWordWrap(True)
             lbl_desc.setStyleSheet("color: #555; border: none; font-size: 12px; margin-top: 4px;")
+            # Habilitar selección en descripción producto
+            lbl_desc.setTextInteractionFlags(Qt.TextSelectableByMouse)
             layout.addWidget(lbl_desc)
         return frame
 

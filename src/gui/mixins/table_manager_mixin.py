@@ -3,10 +3,10 @@ from PySide6.QtGui import QStandardItem, QBrush, QColor
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QTableView, QHeaderView, QAbstractItemView
 
-# Definición global de encabezados
+# Definición global de encabezados (Se agregó "Código")
 COLUMN_HEADERS = [
-    "Score", "Nombre", "Organismo", "Estado", 
-    "Fecha Pub.", "Fecha Cierre", "Monto", "Nota"
+    "Score", "Código", "Nombre", "Organismo", "Estado", 
+    "Fecha Pub.", "Fecha Cierre", "Cierre 2°", "Monto", "Nota"
 ]
 
 class MixinGestorTabla:
@@ -28,24 +28,27 @@ class MixinGestorTabla:
         table.horizontalHeader().setSectionResizeMode(QHeaderView.Interactive)
         table.horizontalHeader().setStretchLastSection(True)
         
-        # Anchos iniciales
-        table.setColumnWidth(0, 60)   # Score
-        table.setColumnWidth(1, 350)  # Nombre
-        table.setColumnWidth(2, 200)  # Organismo
-        table.setColumnWidth(3, 100)  # Estado
-        table.setColumnWidth(4, 90)   # Fecha Pub
-        table.setColumnWidth(5, 110)  # Fecha Cierre
-        table.setColumnWidth(6, 100)  # Monto
-        table.setColumnWidth(7, 60)   # Nota
+        # Anchos iniciales (Actualizados con nueva columna Código)
+        table.setColumnWidth(0, 50)   # Score
+        table.setColumnWidth(1, 110)  # Código (NUEVA)
+        table.setColumnWidth(2, 280)  # Nombre
+        table.setColumnWidth(3, 180)  # Organismo
+        table.setColumnWidth(4, 90)   # Estado
+        table.setColumnWidth(5, 80)   # Fecha Pub
+        table.setColumnWidth(6, 100)  # Fecha Cierre
+        table.setColumnWidth(7, 100)  # Fecha Cierre 2°
+        table.setColumnWidth(8, 90)   # Monto
+        table.setColumnWidth(9, 50)   # Nota
         
         table.setSortingEnabled(True)
         table.setContextMenuPolicy(Qt.CustomContextMenu)
 
+        # Delegados para cortar texto largo (...)
+        # IMPORTANTE: Los índices cambiaron al agregar la columna Código en index 1
         from src.gui.delegates import DelegadoTextoElidido
-        table.setItemDelegateForColumn(1, DelegadoTextoElidido(table))
-        table.setItemDelegateForColumn(2, DelegadoTextoElidido(table))
+        table.setItemDelegateForColumn(2, DelegadoTextoElidido(table)) # Nombre ahora es 2
+        table.setItemDelegateForColumn(3, DelegadoTextoElidido(table)) # Organismo ahora es 3
 
-        
         return table
 
     def poblar_tabla_generica(self, model, lista_datos):
@@ -53,25 +56,29 @@ class MixinGestorTabla:
         model.removeRows(0, model.rowCount())
         
         for data in lista_datos:
-            # 1. Score
+            # 0. Score
             score = getattr(data, 'puntuacion_final', 0)
             item_score = QStandardItem(str(score))
-            item_score.setData(score, Qt.DisplayRole) # Para ordenamiento numérico
+            item_score.setData(score, Qt.DisplayRole)
             item_score.setData(getattr(data, 'ca_id', None), Qt.UserRole + 1)
             
-            # Detalle puntaje (Tooltip)
             detalles = getattr(data, 'puntaje_detalle', [])
             if detalles and isinstance(detalles, list):
                 item_score.setToolTip("\n".join(str(d) for d in detalles))
             
-            # Colores Condicionales
             bg_color = None
-            if score >= 500: bg_color = QColor("#dff6dd") # Verde Muy Alto
-            elif score >= 10: bg_color = QColor("#e6f7ff") # Azul Positivo
-            elif score == 0: bg_color = QColor("#ffffff") # Blanco Neutro
-            elif score < 0: bg_color = QColor("#ffe6e6") # Rojo Negativo
+            if score >= 500: bg_color = QColor("#dff6dd") 
+            elif score >= 10: bg_color = QColor("#e6f7ff") 
+            elif score == 0: bg_color = QColor("#ffffff") 
+            elif score < 0: bg_color = QColor("#ffe6e6") 
             
             if bg_color: item_score.setBackground(QBrush(bg_color))
+
+            # 1. Código (NUEVA)
+            codigo = getattr(data, 'codigo_ca', '') or ''
+            item_codigo = QStandardItem(codigo)
+            item_codigo.setToolTip(codigo)
+            item_codigo.setData(codigo, Qt.UserRole)
 
             # 2. Nombre
             nombre = getattr(data, 'nombre', 'Sin Nombre') or 'Sin Nombre'
@@ -104,14 +111,20 @@ class MixinGestorTabla:
             item_fcierre = QStandardItem(f_cierre_str)
             item_fcierre.setData(f_cierre, Qt.UserRole)
 
-            # 7. Monto
+            # 7. Fecha Cierre 2° Llamado
+            f_cierre2 = getattr(data, 'fecha_cierre_segundo_llamado', None)
+            f_cierre2_str = f_cierre2.strftime("%d-%m %H:%M") if f_cierre2 else "-"
+            item_fcierre2 = QStandardItem(f_cierre2_str)
+            item_fcierre2.setData(f_cierre2, Qt.UserRole)
+
+            # 8. Monto
             monto = getattr(data, 'monto_clp', 0)
             monto_val = float(monto) if monto is not None else 0
             monto_str = f"${int(monto_val):,}".replace(",", ".") if monto is not None else "N/A"
             item_monto = QStandardItem(monto_str)
             item_monto.setData(monto_val, Qt.UserRole)
 
-            # 8. Nota (Protegida)
+            # 9. Nota
             nota_texto = ""
             seguimiento = getattr(data, 'seguimiento', None)
             if seguimiento:
@@ -125,9 +138,10 @@ class MixinGestorTabla:
             if nota_texto: 
                 item_nota.setToolTip(f"Nota: {nota_texto}")
 
+            # Fila final
             row_items = [
-                item_score, item_nombre, item_org, item_estado, 
-                item_fpub, item_fcierre, item_monto, item_nota
+                item_score, item_codigo, item_nombre, item_org, item_estado, 
+                item_fpub, item_fcierre, item_fcierre2, item_monto, item_nota
             ]
             
             model.appendRow(row_items)

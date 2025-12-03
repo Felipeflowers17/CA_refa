@@ -9,6 +9,7 @@ logger = configurar_logger(__name__)
 
 class MixinMenuContextual:
     @Slot(object)
+    @Slot(object)
     def mostrar_menu_contextual(self, pos):
         vista_origen = self.sender()
         if not vista_origen: return
@@ -51,8 +52,10 @@ class MixinMenuContextual:
         accion_mover_ofer = QAction(FIF.SHOPPING_CART.icon(), "Mover a Ofertada", self)
         accion_mover_ofer.triggered.connect(lambda: self._marcar_ofertada(ca_id))
         
-        accion_mover_fav = QAction(FIF.HEART.icon(), "Mover a Favoritas", self)
+        # --- CAMBIO AQUÍ: TEXTO ACTUALIZADO ---
+        accion_mover_fav = QAction(FIF.HEART.icon(), "Mover a Seguimiento", self)
         accion_mover_fav.triggered.connect(lambda: self._mover_a_favoritos(ca_id))
+        # -------------------------------------
 
         # --- LÓGICA DE MENÚ POR PESTAÑA ---
 
@@ -74,7 +77,7 @@ class MixinMenuContextual:
             menu.addAction(accion_web)
 
         elif nombre_objeto == "tab_ofertadas": # Ofertadas
-            menu.addAction(accion_mover_fav) # Regresar a favoritas
+            menu.addAction(accion_mover_fav) # Regresar a seguimiento
             act_unofer = QAction(FIF.REMOVE_FROM.icon(), "Quitar de ofertadas", self)
             act_unofer.triggered.connect(lambda: self._desmarcar_ofertada(ca_id))
             menu.addAction(act_unofer)
@@ -87,7 +90,7 @@ class MixinMenuContextual:
             menu.addAction(accion_web)
 
         menu.exec(vista_origen.viewport().mapToGlobal(pos))
-
+        
     def _agregar_accion_roja(self, menu, text, icon, slot):
         btn = QPushButton(f"  {text}")
         btn.setIcon(icon.icon())
