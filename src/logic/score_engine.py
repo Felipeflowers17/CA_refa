@@ -3,7 +3,7 @@
 Motor de Puntajes.
 
 Este módulo contiene el algoritmo de priorización de licitaciones.
-Trabaja en memoria (RAM) para evaluar miles de registros en milisegundos.
+Implementa lógica de 'Masking' para evitar puntuación doble en frases contenidas.
 """
 import unicodedata
 import json
@@ -22,19 +22,18 @@ class MotorPuntajes:
     def __init__(self, db_service):
         self.db_service = db_service
         
-        # Cache optimizado: estructuras en memoria para evitar consultas a BD por cada fila.
+        # Cache optimizado
         self.cache_palabras_clave: List[Dict[str, Any]] = [] 
         self.reglas_prioritarias: Dict[int, int] = {}
         self.reglas_no_deseadas: Set[int] = set()
         self.mapa_nombre_id_organismo: Dict[str, int] = {}
         
-        # Carga inicial de reglas
+        # Carga inicial
         self.recargar_reglas_memoria()
 
     def recargar_reglas_memoria(self):
         """
-        Carga todas las reglas de negocio (Keywords y Organismos) desde la BD
-        hacia la memoria RAM para un cálculo rápido.
+        Carga reglas desde la BD y las ordena por longitud (DESC) para el masking.
         """
         logger.info("MotorPuntajes: Actualizando caché de reglas en memoria...")
         
@@ -45,11 +44,17 @@ class MotorPuntajes:
             for kw in keywords_orm:
                 self.cache_palabras_clave.append({
                     "keyword": kw.keyword,
-                    "norm": self._normalizar_texto(kw.keyword), # Pre-cálculo de normalización
+                    "norm": self._normalizar_texto(kw.keyword),
                     "p_nom": kw.puntos_nombre or 0,
                     "p_desc": kw.puntos_descripcion or 0,
                     "p_prod": kw.puntos_productos or 0
                 })
+            
+            # --- ORDENAMIENTO CRÍTICO ---
+            # Ordenamos por longitud descendente del texto normalizado.
+            # "materiales de ferreteria" (24 chars) se evaluará antes que "ferreteria" (10 chars).
+            self.cache_palabras_clave.sort(key=lambda x: len(x["norm"]), reverse=True)
+            
         except Exception as e: 
             logger.error(f"Error cargando palabras clave: {e}")
 
@@ -59,7 +64,6 @@ class MotorPuntajes:
         try:
             reglas = self.db_service.obtener_reglas_organismos()
             for r in reglas:
-                # Manejo robusto de Enum (si viene como objeto o string)
                 tipo_val = r.tipo.value if hasattr(r.tipo, 'value') else r.tipo
                 
                 if tipo_val == 'prioritario': 
@@ -69,7 +73,7 @@ class MotorPuntajes:
         except Exception as e:
             logger.error(f"Error cargando reglas de organismos: {e}")
 
-        # 3. Mapa de Nombres de Organismos (Para Fase 1 donde a veces solo tenemos el nombre)
+        # 3. Mapa de Nombres de Organismos
         self.mapa_nombre_id_organismo = {}
         try:
             orgs = self.db_service.obtener_todos_organismos()
@@ -80,25 +84,46 @@ class MotorPuntajes:
             logger.error(f"Error mapeando nombres de organismos: {e}")
 
     def _normalizar_texto(self, texto: Any) -> str: 
-        """
-        Estandariza el texto para comparaciones:
-        - Convierte a minúsculas.
-        - Elimina tildes.
-        - Elimina espacios duplicados.
-        """
-        if not texto: 
-            return ""
-        # Separar caracteres base de sus acentos (Mn)
+        """Estandariza texto: minúsculas, sin tildes, sin espacios dobles."""
+        if not texto: return ""
         s = ''.join(c for c in unicodedata.normalize('NFD', str(texto).lower()) if unicodedata.category(c) != 'Mn')
         return " ".join(s.split())
 
+    def _evaluar_con_masking(self, texto_base: str, campo_puntaje: str, etiqueta: str) -> Tuple[int, List[str]]:
+        """
+        Aplica la lógica de 'Masking' (Enmascaramiento).
+        Si encuentra una keyword, suma puntos y la tacha del texto para que no vuelva a contar.
+        """
+        if not texto_base: return 0, []
+        
+        puntaje_acumulado = 0
+        detalle_acumulado = []
+        
+        # Copia de trabajo para ir "tachando" (reemplazando por ####)
+        texto_trabajo = texto_base
+        
+        for kw_dict in self.cache_palabras_clave:
+            puntos = kw_dict[campo_puntaje]
+            if puntos == 0: continue
+            
+            termino = kw_dict["norm"]
+            if not termino: continue
+            
+            # Si el término está en el texto (que ya puede tener partes tachadas)
+            if termino in texto_trabajo:
+                puntaje_acumulado += puntos
+                detalle_acumulado.append(f"KW {etiqueta}: '{kw_dict['keyword']}' ({'+' if puntos>0 else ''}{puntos})")
+                
+                # --- MASKING ---
+                # Reemplazamos la ocurrencia por un marcador inútil del mismo largo.
+                # Ej: "materiales de ferreteria" -> "########################"
+                mascara = "#" * len(termino)
+                texto_trabajo = texto_trabajo.replace(termino, mascara)
+        
+        return puntaje_acumulado, detalle_acumulado
+
     def calcular_puntaje_fase_1(self, licitacion_raw: dict) -> Tuple[int, List[str]]:
-        """
-        Calcula el puntaje base usando información preliminar:
-        - Nombre de la licitación.
-        - Organismo comprador.
-        - Estado (ej: 2do llamado).
-        """
+        """Calcula puntaje base (Organismo + Estado + Título)."""
         org_norm = self._normalizar_texto(licitacion_raw.get("organismo_comprador"))
         nom_norm = self._normalizar_texto(licitacion_raw.get("nombre"))
         
@@ -110,13 +135,10 @@ class MotorPuntajes:
 
         # 1. Evaluar Organismo
         org_id = self.mapa_nombre_id_organismo.get(org_norm)
-        
-        # Fallback: Búsqueda parcial si no hay match exacto
         if not org_id:
             for name_key, oid in self.mapa_nombre_id_organismo.items():
                 if name_key in org_norm: 
-                    org_id = oid
-                    break
+                    org_id = oid; break
 
         if org_id:
             if org_id in self.reglas_no_deseadas: 
@@ -124,46 +146,42 @@ class MotorPuntajes:
             if org_id in self.reglas_prioritarias: 
                 pts = self.reglas_prioritarias[org_id]
                 puntaje += pts
-                detalle.append(f"Org. Prioritario (+{pts})")
+                detalle.append(f"Org. Prioritario ({'+' if pts>0 else ''}{pts})")
 
-        # 2. Evaluar Estado (Bonificación por 2do llamado)
+        # 2. Evaluar Estado
         est_norm = self._normalizar_texto(licitacion_raw.get("estado_ca_texto"))
         if "segundo llamado" in est_norm: 
             puntaje += PUNTOS_SEGUNDO_LLAMADO
             if PUNTOS_SEGUNDO_LLAMADO != 0:
                 detalle.append(f"2° Llamado (+{PUNTOS_SEGUNDO_LLAMADO})")
         
-        # 3. Evaluar Keywords en Título
-        for kw_dict in self.cache_palabras_clave:
-            if kw_dict["p_nom"] != 0 and kw_dict["norm"] in nom_norm:
-                pts = kw_dict["p_nom"]
-                puntaje += pts
-                detalle.append(f"KW Título: '{kw_dict['keyword']}' (+{pts})")
+        # 3. Evaluar Título (Con Masking)
+        pts_nom, det_nom = self._evaluar_con_masking(nom_norm, "p_nom", "Título")
+        puntaje += pts_nom
+        detalle.extend(det_nom)
                 
         return max(0, puntaje), detalle
 
     def calcular_puntaje_fase_2(self, datos_ficha: dict) -> Tuple[int, List[str]]:
-        """
-        Calcula puntaje avanzado usando información profunda:
-        - Descripción completa.
-        - Listado de productos solicitados.
-        """
+        """Calcula puntaje avanzado (Descripción + Productos)."""
         puntaje = 0
         detalle = []
         
+        # 1. Evaluar Descripción
         desc_norm = self._normalizar_texto(datos_ficha.get("descripcion"))
+        if desc_norm:
+            pts_desc, det_desc = self._evaluar_con_masking(desc_norm, "p_desc", "Desc.")
+            puntaje += pts_desc
+            detalle.extend(det_desc)
         
-        # Procesamiento seguro de productos (puede venir como JSON string, list o None)
+        # 2. Evaluar Productos
         prods_raw = datos_ficha.get("productos_solicitados")
         if isinstance(prods_raw, str):
-            try: 
-                prods_raw = json.loads(prods_raw)
-            except: 
-                prods_raw = []
+            try: prods_raw = json.loads(prods_raw)
+            except: prods_raw = []
         elif prods_raw is None:
             prods_raw = []
             
-        # Aplanar lista de productos a un solo string para búsqueda rápida
         txt_prods_norm = ""
         if isinstance(prods_raw, list):
             parts = []
@@ -174,21 +192,9 @@ class MotorPuntajes:
                     parts.append(self._normalizar_texto(f"{n} {d}"))
             txt_prods_norm = " | ".join(parts)
 
-        # Evaluar Keywords
-        for kw_dict in self.cache_palabras_clave:
-            kw_norm = kw_dict["norm"]
-            if not kw_norm: continue
-            
-            # Revisar Descripción
-            if kw_dict["p_desc"] != 0 and desc_norm and kw_norm in desc_norm:
-                pts = kw_dict["p_desc"]
-                puntaje += pts
-                detalle.append(f"KW Descripcion: '{kw_dict['keyword']}' (+{pts})")
-            
-            # Revisar Productos
-            if kw_dict["p_prod"] != 0 and txt_prods_norm and kw_norm in txt_prods_norm:
-                pts = kw_dict["p_prod"]
-                puntaje += pts
-                detalle.append(f"KW Producto: '{kw_dict['keyword']}' (+{pts})")
+        if txt_prods_norm:
+            pts_prod, det_prod = self._evaluar_con_masking(txt_prods_norm, "p_prod", "Prod.")
+            puntaje += pts_prod
+            detalle.extend(det_prod)
                 
         return puntaje, detalle

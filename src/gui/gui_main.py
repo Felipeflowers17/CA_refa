@@ -113,16 +113,15 @@ class InterfazTabla(QWidget):
         self.setObjectName(object_name)
         
         self.estado_filtro = {
-            "2do_llamado": False, "monto": 0, "show_zeros": False, 
-            "selected_states": [], "pub_from": None, "pub_to": None,
+            "2do_llamado": False, 
+            "monto": 0, 
+            # Cambiado a True por defecto para que muestre todo si no se filtra
+            "show_zeros": True, 
+            "selected_states": [], 
+            "pub_from": None, "pub_to": None,
             "close_from": None, "close_to": None
         }
         
-        self.estados_disponibles = [
-            "Publicada", "Cerrada", "Desierta", "Adjudicada", 
-            "OC Emitida", "Cancelada", "Revocada", "Suspendida"
-        ]
-
         self.vBoxLayout = QVBoxLayout(self)
         self.vBoxLayout.setContentsMargins(20, 20, 20, 20)
         self.vBoxLayout.setSpacing(10)
@@ -154,15 +153,7 @@ class InterfazTabla(QWidget):
         layout = QVBoxLayout(self.vista_filtro)
         layout.setSpacing(15); layout.setContentsMargins(20, 20, 20, 20)
         
-        h_top = QHBoxLayout()
-        lbl_zeros = BodyLabel("Mostrar Puntajes 0")
-        switch_zeros = SwitchButton()
-        switch_zeros.setOnText("Sí"); switch_zeros.setOffText("No")
-        switch_zeros.setChecked(self.estado_filtro["show_zeros"])
-        switch_zeros.checkedChanged.connect(lambda c: self._actualizar_filtro("show_zeros", c))
-        h_top.addWidget(lbl_zeros); h_top.addStretch(); h_top.addWidget(switch_zeros)
-        layout.addLayout(h_top); layout.addWidget(self._sep())
-
+        # --- SECCIÓN MONTO ---
         h_monto = QHBoxLayout()
         h_monto.addWidget(StrongBodyLabel("Monto Mínimo ($):"))
         h_monto.addStretch()
@@ -174,21 +165,19 @@ class InterfazTabla(QWidget):
         h_monto.addWidget(spin_monto)
         layout.addLayout(h_monto); layout.addWidget(self._sep())
 
+        # --- SECCIÓN ESTADOS (SOLO 2DO LLAMADO) ---
         layout.addWidget(StrongBodyLabel("Filtro de Estados"))
+        
         chk_2do = CheckBox("Solo 2° Llamado")
         chk_2do.setChecked(self.estado_filtro["2do_llamado"])
         chk_2do.stateChanged.connect(lambda s: self._actualizar_filtro("2do_llamado", chk_2do.isChecked()))
         layout.addWidget(chk_2do)
         
-        self.combo_states = CheckableComboBox()
-        self.combo_states.setPlaceholderText("Seleccionar estados...")
-        self.combo_states.addItems(self.estados_disponibles)
-        for i, state in enumerate(self.estados_disponibles):
-            if state in self.estado_filtro["selected_states"]:
-                self.combo_states.setItemChecked(i, True)
-        self.combo_states.checkedChanged.connect(self._al_cambiar_combo_estados)
-        layout.addWidget(self.combo_states); layout.addWidget(self._sep())
+        # Se eliminó el ComboBox de estados múltiples aquí
+        
+        layout.addWidget(self._sep())
 
+        # --- SECCIÓN FECHAS ---
         def crear_bloque_fecha(titulo, key_from, key_to, cal_from_attr, cal_to_attr):
             container = QWidget(); v_layout = QVBoxLayout(container); v_layout.setContentsMargins(0,0,0,0); v_layout.setSpacing(8)
             v_layout.addWidget(StrongBodyLabel(titulo))
@@ -204,7 +193,7 @@ class InterfazTabla(QWidget):
 
         block_pub = crear_bloque_fecha("Fecha de Publicación", "pub_from", "pub_to", "cal_pub_from", "cal_pub_to")
         layout.addWidget(block_pub)
-        # Uso de QDate
+        
         if self.estado_filtro["pub_from"]: self.cal_pub_from.setDate(QDate(self.estado_filtro["pub_from"]))
         if self.estado_filtro["pub_to"]: self.cal_pub_to.setDate(QDate(self.estado_filtro["pub_to"]))
         self.cal_pub_from.dateChanged.connect(lambda d: self._actualizar_fecha("pub_from", d))
@@ -219,10 +208,13 @@ class InterfazTabla(QWidget):
         self.cal_close_to.dateChanged.connect(lambda d: self._actualizar_fecha("close_to", d))
 
         layout.addStretch()
+        
+        # Botón Reset
         h_reset = QHBoxLayout(); h_reset.addStretch()
         btn_reset = ToolButton(FIF.DELETE, self); btn_reset.setToolTip("Limpiar Filtros")
         btn_reset.clicked.connect(self._resetear_filtros)
         h_reset.addWidget(btn_reset); layout.addLayout(h_reset)
+        
         Flyout.make(self.vista_filtro, self.botonFiltro, self, FlyoutAnimationType.DROP_DOWN)
 
     def _sep(self):
@@ -237,13 +229,9 @@ class InterfazTabla(QWidget):
         self.estado_filtro[key] = qdate.toPython()
         self.filtrosCambios.emit()
 
-    def _al_cambiar_combo_estados(self):
-        items = self.combo_states.checkedItems()
-        self.estado_filtro["selected_states"] = [item.text() for item in items]
-        self.filtrosCambios.emit()
-
     def _resetear_filtros(self):
-        self.estado_filtro = { "2do_llamado": False, "monto": 0, "show_zeros": False, "selected_states": [], "pub_from": None, "pub_to": None, "close_from": None, "close_to": None }
+        # Reiniciamos todo (show_zeros en True para que se vea todo por defecto)
+        self.estado_filtro = { "2do_llamado": False, "monto": 0, "show_zeros": True, "selected_states": [], "pub_from": None, "pub_to": None, "close_from": None, "close_to": None }
         self.filtrosCambios.emit()
 
 # --- CLASE PRINCIPAL ---

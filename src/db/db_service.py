@@ -18,7 +18,8 @@ from .db_models import (
     CaOrganismo,
     CaSector,
     CaPalabraClave,
-    CaOrganismoRegla
+    CaOrganismoRegla,
+    TipoReglaOrganismo
 )
 from src.utils.logger import configurar_logger
 
@@ -544,3 +545,47 @@ class DbService:
         with self.session_factory() as session: 
             objs = self.obtener_licitaciones_ofertadas()
             return self._convertir_a_diccionario_seguro(objs)
+        
+    def exportar_config_keywords(self) -> List[Dict]:
+        """Retorna lista de diccionarios con todas las keywords y sus puntajes."""
+        with self.session_factory() as session:
+            kws = session.scalars(select(CaPalabraClave).order_by(CaPalabraClave.keyword)).all()
+            return [{
+                "ID": k.keyword_id,
+                "Palabra Clave": k.keyword,
+                "Puntos Título": k.puntos_nombre,
+                "Puntos Descripción": k.puntos_descripcion,
+                "Puntos Productos": k.puntos_productos
+            } for k in kws]
+
+    def exportar_config_organismos(self) -> List[Dict]:
+        """
+        Retorna lista completa de organismos indicando su estado (Regla) y puntaje.
+        Incluye los Neutros (sin regla).
+        """
+        with self.session_factory() as session:
+            # Join izquierdo para traer organismos aunque no tengan regla
+            stmt = select(CaOrganismo, CaOrganismoRegla).outerjoin(
+                CaOrganismoRegla, CaOrganismo.organismo_id == CaOrganismoRegla.organismo_id
+            ).order_by(CaOrganismo.nombre)
+            
+            resultados = []
+            for org, regla in session.execute(stmt):
+                estado = "Neutro"
+                puntos = 0
+                if regla:
+                    if regla.tipo == TipoReglaOrganismo.PRIORITARIO:
+                        estado = "Prioritario"
+                        puntos = regla.puntos
+                    elif regla.tipo == TipoReglaOrganismo.NO_DESEADO:
+                        estado = "No Deseado"
+                        puntos = regla.puntos # Generalmente negativo
+                
+                resultados.append({
+                    "ID": org.organismo_id,
+                    "Organismo": org.nombre,
+                    "Estado": estado,
+                    "Puntos Asignados": puntos,
+                    "Es Nuevo": "Sí" if org.es_nuevo else "No"
+                })
+            return resultados

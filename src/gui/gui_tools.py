@@ -30,7 +30,8 @@ COLOR_PENDIENTE = QColor(255, 255, 255)   # Blanco puro (Nuevo)
 
 class ModeloOrganismos(QAbstractTableModel):
     """
-    Modelo virtual optimizado con distinción REAL entre Pendiente y Neutro.
+    Modelo virtual optimizado. Se han eliminado los iconos de estado (emojis)
+    para una apariencia más limpia y profesional.
     """
     RolOrdenamiento = Qt.UserRole + 10
     
@@ -48,7 +49,6 @@ class ModeloOrganismos(QAbstractTableModel):
         
         org = self._datos[index.row()]
         regla = self._reglas.get(org.organismo_id)
-        # Obtenemos el valor real de la BD
         es_nuevo = getattr(org, 'es_nuevo', False)
         
         col = index.column()
@@ -59,11 +59,9 @@ class ModeloOrganismos(QAbstractTableModel):
                 if regla:
                     if regla.tipo == TipoReglaOrganismo.PRIORITARIO: return 0
                     if regla.tipo == TipoReglaOrganismo.NO_DESEADO: return 4
-                    return 3 # Neutro explícito (Manual)
-                
-                # Sin regla:
-                if es_nuevo: return 1 # Pendiente (Prioridad alta visual)
-                return 2 # Neutro por defecto (Prioridad baja)
+                    return 3 
+                if es_nuevo: return 1 
+                return 2 
 
             if col == 0: return org.organismo_id
             if col == 1: return org.nombre
@@ -74,13 +72,10 @@ class ModeloOrganismos(QAbstractTableModel):
             if col == 0: return str(org.organismo_id)
             if col == 1: return org.nombre
             if col == 2: 
-                # LÓGICA CORREGIDA AQUÍ:
                 if regla:
                     if regla.tipo == TipoReglaOrganismo.PRIORITARIO: return "Prioritario"
                     if regla.tipo == TipoReglaOrganismo.NO_DESEADO: return "No Deseado"
                     return "Neutro"
-                
-                # Si no hay regla, diferenciamos por la fecha de creación (es_nuevo)
                 return "Pendiente (Nuevo)" if es_nuevo else "Neutro"
             
             if col == 3:
@@ -89,18 +84,12 @@ class ModeloOrganismos(QAbstractTableModel):
         
         # --- ROL DE DECORACIÓN (ICONOS) ---
         elif role == Qt.DecorationRole:
-            # Solo mostramos el icono INFO si realmente es nuevo y no tiene regla
+            # Solo mantenemos el icono de "Info" en la columna Nombre para los nuevos
             if col == 1 and not regla and es_nuevo:
                 return FIF.INFO.icon()
             
-            if col == 2:
-                if regla:
-                    if regla.tipo == TipoReglaOrganismo.PRIORITARIO: return FIF.HEART.icon()
-                    if regla.tipo == TipoReglaOrganismo.NO_DESEADO: return FIF.DELETE.icon()
-                    return FIF.TAG.icon()
-                
-                # Icono RULER para nuevos, TAG para viejos (neutros)
-                return FIF.RULER.icon() if es_nuevo else FIF.TAG.icon()
+            # ELIMINADO: Ya no devolvemos iconos para la columna 2 (Estado)
+            return None
 
         # --- ROL DE FONDO (COLORES) ---
         elif role == Qt.BackgroundRole:
@@ -109,7 +98,6 @@ class ModeloOrganismos(QAbstractTableModel):
                 if regla.tipo == TipoReglaOrganismo.NO_DESEADO: return QBrush(COLOR_NO_DESEADO)
                 return QBrush(COLOR_NEUTRO)
             
-            # Blanco puro solo para los Pendientes Reales
             return QBrush(COLOR_PENDIENTE) if es_nuevo else QBrush(COLOR_NEUTRO)
             
         return None
@@ -127,7 +115,8 @@ class ModeloOrganismos(QAbstractTableModel):
 
     def get_organismo_at(self, row):
         return self._datos[row]
-
+    
+    
 class ModeloKeywords(QAbstractTableModel):
     def __init__(self, keywords):
         super().__init__()
@@ -290,12 +279,74 @@ class WidgetHerramientas(QWidget):
         self.senal_iniciar_scraping.emit({"mode": "to_db", "date_from": d_from, "date_to": d_to, "max_paginas": self.sPages.value()})
 
     def _pag_exportar(self):
-        w = QWidget(); l = QVBoxLayout(w); l.setSpacing(15); l.addWidget(SubtitleLabel("Exportación", w))
-        self.chk_bd = CheckBox("Base de Datos Completa", w); self.chk_tabs = CheckBox("Pestañas Visibles", w); self.chk_tabs.setChecked(True)
-        l.addWidget(self.chk_bd); l.addWidget(self.chk_tabs)
-        h = QHBoxLayout(); self.cExcel = CheckBox("Excel", w); self.cExcel.setChecked(True); h.addWidget(self.cExcel); h.addStretch(); l.addLayout(h)
-        btn = PrimaryPushButton("Generar", w); btn.clicked.connect(lambda: self.senal_iniciar_exportacion.emit([{"tipo": "bd_full" if self.chk_bd.isChecked() else "tabs", "format": "excel", "scope": "all"}])); l.addWidget(btn); l.addStretch()
+        w = QWidget(); l = QVBoxLayout(w); l.setSpacing(20)
+        l.addWidget(SubtitleLabel("Configuración de Exportación", w))
+        
+        # Sección 1: Qué exportar
+        l.addWidget(StrongBodyLabel("1. Selecciona los datos:", w))
+        
+        container_data = QWidget(); h_data = QHBoxLayout(container_data); h_data.setContentsMargins(10,0,0,0)
+        self.chk_bd = CheckBox("Base de Datos Completa (Backup)", w)
+        self.chk_tabs = CheckBox("Pestañas Visibles (Gestión)", w); self.chk_tabs.setChecked(True)
+        self.chk_config = CheckBox("Keywords y Organismos (Reglas)", w) # NUEVO
+        
+        h_data.addWidget(self.chk_bd); h_data.addWidget(self.chk_tabs); h_data.addWidget(self.chk_config)
+        l.addWidget(container_data)
+        
+        l.addWidget(QFrame(frameShape=QFrame.HLine)) # Separador visual
+        
+        # Sección 2: Formatos
+        l.addWidget(StrongBodyLabel("2. Selecciona formatos:", w))
+        
+        container_fmt = QWidget(); h_fmt = QHBoxLayout(container_fmt); h_fmt.setContentsMargins(10,0,0,0)
+        self.chk_excel = CheckBox("Excel (.xlsx)", w); self.chk_excel.setChecked(True)
+        self.chk_csv = CheckBox("CSV (.csv)", w) # NUEVO
+        
+        h_fmt.addWidget(self.chk_excel); h_fmt.addWidget(self.chk_csv); h_fmt.addStretch()
+        l.addWidget(container_fmt)
+        
+        l.addStretch()
+        
+        # Botón Generar
+        btn = PrimaryPushButton("Generar Archivos", w)
+        btn.clicked.connect(self._generar_tareas_exportacion)
+        l.addWidget(btn)
+        
         return w
+    
+    def _generar_tareas_exportacion(self):
+        # 1. Detectar Tipos de Datos
+        tipos_seleccionados = []
+        if self.chk_bd.isChecked(): tipos_seleccionados.append("bd_full")
+        if self.chk_tabs.isChecked(): tipos_seleccionados.append("tabs")
+        if self.chk_config.isChecked(): tipos_seleccionados.append("config")
+        
+        # 2. Detectar Formatos
+        formatos_seleccionados = []
+        if self.chk_excel.isChecked(): formatos_seleccionados.append("excel")
+        if self.chk_csv.isChecked(): formatos_seleccionados.append("csv")
+        
+        # Validaciones
+        if not tipos_seleccionados:
+            InfoBar.warning("Falta selección", "Selecciona al menos un tipo de datos.", parent=self.window())
+            return
+        if not formatos_seleccionados:
+            InfoBar.warning("Falta formato", "Selecciona al menos un formato (Excel o CSV).", parent=self.window())
+            return
+            
+        # 3. Generar Matriz de Tareas (Producto Cartesiano)
+        # Si selecciona 2 tipos y 2 formatos, se generan 4 tareas.
+        lista_tareas = []
+        for tipo in tipos_seleccionados:
+            for fmt in formatos_seleccionados:
+                lista_tareas.append({
+                    "tipo": tipo,
+                    "format": fmt,
+                    "scope": "all"
+                })
+        
+        # Emitir señal con todas las tareas
+        self.senal_iniciar_exportacion.emit(lista_tareas)
 
     def _pag_auto(self):
         w = QWidget(); l = QVBoxLayout(w); l.addWidget(SubtitleLabel("Piloto Automático", w))

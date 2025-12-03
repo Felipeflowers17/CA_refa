@@ -124,33 +124,19 @@ class ServicioExcel:
         return self._guardar_archivos(dfs_para_exportar, formato, "Reporte_Gestion", directorio_destino)
 
     def generar_reporte_configuracion(self, formato: str, directorio_destino: Path) -> str:
-        """Exporta las reglas de negocio actuales (Auditoría)."""
-        logger.info("Exportando Configuración...")
+        """Exporta las reglas de negocio (Keywords y Organismos) detalladas."""
+        logger.info(f"Exportando Configuración en formato {formato}...")
         dfs_para_exportar = {}
         
         # 1. Keywords
-        keywords = self.db_service.obtener_todas_palabras_clave()
-        data_kw = [{
-            "Keyword": k.keyword,
-            "Puntos Nombre": k.puntos_nombre,
-            "Puntos Descripcion": k.puntos_descripcion,
-            "Puntos Productos": k.puntos_productos
-        } for k in keywords]
+        data_kw = self.db_service.exportar_config_keywords()
         dfs_para_exportar["Keywords"] = pd.DataFrame(data_kw)
         
-        # 2. Reglas Organismos
-        reglas = self.db_service.obtener_reglas_organismos()
-        data_org = []
-        for r in reglas:
-            tipo_val = r.tipo.value if hasattr(r.tipo, 'value') else r.tipo
-            data_org.append({
-                "Organismo": r.organismo.nombre if r.organismo else "Desconocido",
-                "Tipo Regla": tipo_val,
-                "Puntos": r.puntos
-            })
-        dfs_para_exportar["Reglas_Organismos"] = pd.DataFrame(data_org)
+        # 2. Organismos (Todos con su estado)
+        data_org = self.db_service.exportar_config_organismos()
+        dfs_para_exportar["Organismos_Reglas"] = pd.DataFrame(data_org)
 
-        return self._guardar_archivos(dfs_para_exportar, formato, "Configuracion_Reglas", directorio_destino)
+        return self._guardar_archivos(dfs_para_exportar, formato, "Reporte_Configuracion_Reglas", directorio_destino)
 
     def generar_backup_bd_completa(self, formato: str, directorio_destino: Path) -> str:
         """Genera un volcado completo de todas las tablas (Backup)."""
