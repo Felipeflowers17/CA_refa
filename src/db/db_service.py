@@ -122,7 +122,11 @@ class DbService:
                         continue
                     codigos_vistos.add(codigo)
                     
-                    org_nombre = item.get("organismo", "No Especificado").strip()
+                    # --- CORRECCIÓN AQUÍ: Manejo seguro de nulos ---
+                    org_raw = item.get("organismo")
+                    # Si org_raw es None o vacío, usamos "No Especificado"
+                    org_nombre = (org_raw if org_raw else "No Especificado").strip()
+                    # -----------------------------------------------
                     
                     record = {
                         "codigo_ca": codigo,
