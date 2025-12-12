@@ -130,12 +130,16 @@ class InterfazTabla(QWidget):
         self.barraBusqueda = LineEdit()
         self.barraBusqueda.setPlaceholderText("Buscar por Código, Nombre u Organismo...")
         self.barraBusqueda.setClearButtonEnabled(True)
+
+        self.botonImportar = ToolButton(FIF.ADD, self)
+        self.botonImportar.setToolTip("Agregar manual (Importar códigos)")
         
         self.botonFiltro = ToolButton(FIF.FILTER, self)
         self.botonFiltro.setToolTip("Filtros Avanzados")
         self.botonFiltro.clicked.connect(self._mostrar_popup_filtros)
         
         self.topLayout.addWidget(self.barraBusqueda, 1)
+        self.topLayout.addWidget(self.botonImportar)
         self.topLayout.addWidget(self.botonFiltro)
         self.vBoxLayout.addLayout(self.topLayout)
 
@@ -359,19 +363,23 @@ class MainWindow(FluentWindow, MixinHilos, MixinSlotsPrincipales, MixinCargaDato
         self.start_task(task=self.servicio_etl.ejecutar_actualizacion_selectiva, on_result=lambda: logger.info("Actualización selectiva OK"), on_error=self.on_task_error, on_finished=self.on_fase2_update_finished, on_progress=self.on_progress_update, on_progress_percent=self.on_progress_percent_update, task_kwargs={"alcances": scopes})
 
     def _conectar_senales_tablas(self):
+        
         ui = self.interfazCandidatas
         ui.barraBusqueda.textChanged.connect(lambda: self.actualizar_filtro_proxy(self.proxy_tab1, ui))
         ui.filtrosCambios.connect(lambda: self.actualizar_filtro_proxy(self.proxy_tab1, ui))
+        ui.botonImportar.clicked.connect(lambda: self.abrir_importacion_manual("candidatas"))
         self.tabla_unificada.customContextMenuRequested.connect(self.mostrar_menu_contextual)
         
         ui3 = self.interfazSeguimiento
         ui3.barraBusqueda.textChanged.connect(lambda: self.actualizar_filtro_proxy(self.proxy_tab3, ui3))
         ui3.filtrosCambios.connect(lambda: self.actualizar_filtro_proxy(self.proxy_tab3, ui3))
+        ui3.botonImportar.clicked.connect(lambda: self.abrir_importacion_manual("seguimiento"))
         self.tabla_seguimiento.customContextMenuRequested.connect(self.mostrar_menu_contextual)
         
         ui4 = self.interfazOfertadas
         ui4.barraBusqueda.textChanged.connect(lambda: self.actualizar_filtro_proxy(self.proxy_tab4, ui4))
         ui4.filtrosCambios.connect(lambda: self.actualizar_filtro_proxy(self.proxy_tab4, ui4))
+        ui4.botonImportar.clicked.connect(lambda: self.abrir_importacion_manual("ofertadas"))
         self.tabla_ofertadas.customContextMenuRequested.connect(self.mostrar_menu_contextual)
 
         self.tabla_unificada.doubleClicked.connect(self.on_table_double_clicked)

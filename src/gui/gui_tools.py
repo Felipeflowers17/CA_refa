@@ -476,10 +476,11 @@ class WidgetHerramientas(QWidget):
 
         self.pivot_conf.currentItemChanged.connect(lambda k: self.stack_conf.setCurrentIndex(0 if k == "orgs" else 1))
         
-        self._cargar_datos_config()
+        self.cargar_datos_config()
         return w
 
-    def _cargar_datos_config(self):
+    def cargar_datos_config(self):
+        """Recarga la lista de organismos y keywords desde la BD."""
         orgs = self.db_service.obtener_todos_organismos()
         reglas = {r.organismo_id: r for r in self.db_service.obtener_reglas_organismos()}
         self.modeloOrgs.actualizar_datos(orgs, reglas)
@@ -525,7 +526,7 @@ class WidgetHerramientas(QWidget):
     def _set_org_regla(self, oid, tipo, pts=None):
         if tipo is None: self.db_service.eliminar_regla_organismo(oid)
         else: self.db_service.establecer_regla_organismo(oid, tipo, pts)
-        self._cargar_datos_config()
+        self.cargar_datos_config()
 
     def _accion_masiva_tipo(self, tipo):
         indices = self.tblOrgs.selectionModel().selectedRows()
@@ -551,7 +552,7 @@ class WidgetHerramientas(QWidget):
                 
                 self.db_service.establecer_regla_organismo(oid, tipo, pts)
             
-        self._cargar_datos_config()
+        self.cargar_datos_config()
         InfoBar.success("Proceso completado", f"Se actualizaron {len(ids)} organismos.", parent=self.window())
 
     # --- LÓGICA KEYWORDS ---
@@ -560,7 +561,7 @@ class WidgetHerramientas(QWidget):
         if txt:
             self.db_service.agregar_palabra_clave(txt, "titulo_pos", 5)
             self.txtNewKw.clear()
-            self._cargar_datos_config()
+            self.cargar_datos_config()
 
     def _doble_click_kw(self, index):
         real_idx = index 
@@ -574,4 +575,4 @@ class WidgetHerramientas(QWidget):
                 with self.db_service.session_factory() as s:
                     s.execute(update(CaPalabraClave).where(CaPalabraClave.keyword_id==kw.keyword_id).values(keyword=n, puntos_nombre=a, puntos_descripcion=b, puntos_productos=c))
                     s.commit()
-            self._cargar_datos_config()
+            self.cargar_datos_config()

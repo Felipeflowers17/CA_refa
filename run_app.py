@@ -7,6 +7,10 @@ import os
 import subprocess
 from pathlib import Path
 
+# run_app.py
+
+
+
 # Configuración específica para Windows y Playwright en modo ejecutable
 if sys.platform == 'win32':
     local_app_data = os.getenv('LOCALAPPDATA')

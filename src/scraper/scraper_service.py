@@ -136,7 +136,7 @@ class ServicioScraper:
                     break
                 if total_paginas_estimado > 0 and pagina_actual > total_paginas_estimado: 
                     break
-                if pagina_actual > 300: # Límite de seguridad
+                if pagina_actual > 600: # Límite de seguridad
                     break 
 
                 if callback_progreso: 
@@ -187,7 +187,7 @@ class ServicioScraper:
         url_api = constructor_url.construir_url_api_ficha(codigo_ca)
         
         try:
-            # Usamos headers de sesión si existen, sino headers genéricos (a veces funciona sin auth)
+            # Usamos headers de sesión si existen, sino headers genéricos
             headers = self.headers_sesion or HEADERS_API
             resp = requests.get(url_api, headers=headers, timeout=10)
             
@@ -199,14 +199,46 @@ class ServicioScraper:
             return None
         
         # Validación y Extracción
-        if datos and datos.get('success') == 'OK' and 'payload' in datos:
+        if datos and datos.get('success') == 'OK' and datos.get('payload'):
             payload = datos['payload']
             
-            # Lógica de fallback para el texto del estado
+            # 1. EXTRACCIÓN DE ORGANISMO (Corregido según tu captura)
+            nombre_organismo = ""
+            # Prioridad 1: Estructura nueva 'informacion_institucion'
+            info_inst = payload.get('informacion_institucion')
+            if isinstance(info_inst, dict):
+                nombre_organismo = info_inst.get('organismo_comprador', "")
+            
+            # Prioridad 2: Fallback a estructura antigua 'Comprador'
+            if not nombre_organismo:
+                comprador_raw = payload.get('Comprador')
+                if isinstance(comprador_raw, dict):
+                    nombre_organismo = comprador_raw.get('NombreOrganismo', "")
+                elif isinstance(comprador_raw, list) and len(comprador_raw) > 0:
+                    nombre_organismo = comprador_raw[0].get('NombreOrganismo', "")
+
+            # 2. EXTRACCIÓN DE ESTADO (OC, Adjudicada, Desierta)
             estado_texto = payload.get('estado')
             if not estado_texto and payload.get('motivo_desierta'):
-                estado_texto = "Desierta"
+                estado_texto = payload.get('estado')
             
+            lista_oc = payload.get('ordenes_compra', [])
+            if lista_oc and len(lista_oc) > 0:
+                 estado_texto = "OC Emitida"
+            elif payload.get('adjudicacion'):
+                 adj = payload.get('adjudicacion')
+                 if isinstance(adj, list) and len(adj) > 0:
+                     estado_texto = "Adjudicada"
+                 elif isinstance(adj, dict) and adj.get('url_acta'):
+                     estado_texto = "Adjudicada"
+            elif payload.get('motivo_desierta') or estado_texto == 'Desierta':
+                estado_texto = "Desierta"
+
+            # 3. EXTRACCIÓN DE MONTOS Y FECHAS (Según tus capturas)
+            # En la ficha individual, el monto viene como 'presupuesto_estimado'
+            monto_estimado = payload.get('presupuesto_estimado')
+            fecha_pub = payload.get('fecha_publicacion')
+
             # Mapeo limpio de datos
             return {
                 'descripcion': payload.get('descripcion'),
@@ -217,6 +249,9 @@ class ServicioScraper:
                 'estado': estado_texto, 
                 'cantidad_provedores_cotizando': payload.get('cantidad_provedores_cotizando'),
                 'estado_convocatoria': payload.get('estado_convocatoria'),
-                'plazo_entrega': payload.get('plazo_entrega') 
+                'plazo_entrega': payload.get('plazo_entrega'),
+                'organismo_nombre': nombre_organismo, # Nombre real
+                'monto_estimado': monto_estimado,     # Monto real
+                'fecha_publicacion': fecha_pub        # Fecha real
             }
         return None

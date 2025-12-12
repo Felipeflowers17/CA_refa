@@ -22,13 +22,11 @@ class MotorPuntajes:
     def __init__(self, db_service):
         self.db_service = db_service
         
-        # Cache optimizado
         self.cache_palabras_clave: List[Dict[str, Any]] = [] 
         self.reglas_prioritarias: Dict[int, int] = {}
-        self.reglas_no_deseadas: Set[int] = set()
-        self.mapa_nombre_id_organismo: Dict[str, int] = {}
+        self.reglas_no_deseadas: Dict[int, int] = {} 
         
-        # Carga inicial
+        self.mapa_nombre_id_organismo: Dict[str, int] = {}
         self.recargar_reglas_memoria()
 
     def recargar_reglas_memoria(self):
@@ -60,7 +58,7 @@ class MotorPuntajes:
 
         # 2. Cargar Reglas de Organismos
         self.reglas_prioritarias = {}
-        self.reglas_no_deseadas = set()
+        self.reglas_no_deseadas = {} # Reiniciar como Diccionario
         try:
             reglas = self.db_service.obtener_reglas_organismos()
             for r in reglas:
@@ -69,7 +67,9 @@ class MotorPuntajes:
                 if tipo_val == 'prioritario': 
                     self.reglas_prioritarias[r.organismo_id] = r.puntos
                 elif tipo_val == 'no_deseado': 
-                    self.reglas_no_deseadas.add(r.organismo_id)
+                    # Si viene None, forzamos un -100 por defecto
+                    self.reglas_no_deseadas[r.organismo_id] = r.puntos if r.puntos is not None else -100
+
         except Exception as e:
             logger.error(f"Error cargando reglas de organismos: {e}")
 
@@ -141,8 +141,10 @@ class MotorPuntajes:
                     org_id = oid; break
 
         if org_id:
-            if org_id in self.reglas_no_deseadas: 
-                return -9999, ["Organismo No Deseado"]
+            if org_id in self.reglas_no_deseadas:
+                pts = self.reglas_no_deseadas[org_id]
+                return pts, [f"Organismo No Deseado ({pts})"]
+                
             if org_id in self.reglas_prioritarias: 
                 pts = self.reglas_prioritarias[org_id]
                 puntaje += pts

@@ -2,7 +2,7 @@
 from PySide6.QtWidgets import QMessageBox, QSystemTrayIcon
 from PySide6.QtCore import Slot, Qt
 import datetime 
-
+from src.gui.gui_import_dialog import DialogoImportacionManual
 from src.gui.gui_scraping_dialog import DialogoScraping
 from src.utils.logger import configurar_logger
 
@@ -80,11 +80,16 @@ class MixinSlotsPrincipales:
     @Slot()
     def on_scraping_completed(self):
         self.set_ui_busy(False)
-        self.on_load_data_thread() # Refrescar tabla automáticamente
+        self.on_load_data_thread() # Refrescar tabla principal de licitaciones
+        
+        # Si la interfaz de herramientas existe, recargamos la lista de organismos
+        if hasattr(self, 'interfazHerramientas'):
+            self.interfazHerramientas.cargar_datos_config()
+        # ---------------------
+
         if self.tray_icon and not self.ultimo_error:
             self.tray_icon.showMessage("Monitor CA", "Scraping finalizado exitosamente.", QSystemTrayIcon.Information, 3000)
 
-    # --- OTRAS ACCIONES ---
 
     @Slot()
     def on_run_recalculate_thread(self):
@@ -118,3 +123,30 @@ class MixinSlotsPrincipales:
         """Callback genérico para tareas automáticas."""
         self.set_ui_busy(False)
         self.on_load_data_thread()
+
+    @Slot(str)
+    def abrir_importacion_manual(self, destino: str):
+        """Abre el diálogo para importar códigos a una pestaña específica."""
+        if self.tarea_en_ejecucion: 
+            QMessageBox.warning(self, "Ocupado", "Hay una tarea en curso. Espera a que termine.")
+            return
+
+        d = DialogoImportacionManual(destino, self)
+        d.start_import.connect(lambda lista: self._ejecutar_importacion_backend(lista, destino))
+        d.exec()
+
+    def _ejecutar_importacion_backend(self, lista_codigos, destino):
+        logger.info(f"Importando {len(lista_codigos)} códigos a {destino}")
+        
+        def on_import_finished():
+            self.set_ui_busy(False)
+            self.on_load_data_thread()
+            QMessageBox.information(self, "Importación Completa", "Se han procesado los códigos ingresados.")
+
+        self.start_task(
+            task=self.servicio_etl.importar_lista_manual,
+            on_finished=on_import_finished,
+            on_progress=self.on_progress_update,
+            on_progress_percent=self.on_progress_percent_update,
+            task_kwargs={"lista_codigos": lista_codigos, "destino": destino}
+        )

@@ -268,3 +268,95 @@ class ServicioEtl:
                 logger.info(f"Limpieza: {cerradas} cerradas, {eliminados} borradas.")
         except Exception as e:
             logger.error(f"Error en limpieza automática: {e}")
+
+    def importar_lista_manual(self, lista_codigos: List[str], destino: str, callback_texto=None, callback_porcentaje=None):
+        """
+        Importa manualmente una lista de códigos CA.
+        destino: 'candidatas', 'seguimiento' u 'ofertadas'.
+        """
+        emitir_texto, emitir_porcentaje = self._crear_emisores_progreso(callback_texto, callback_porcentaje)
+        
+        # Limpieza de lista
+        codigos_limpios = [c.strip().upper() for c in lista_codigos if c.strip()]
+        total = len(codigos_limpios)
+        if total == 0: return 0
+
+        emitir_texto(f"Iniciando importación manual de {total} códigos para '{destino}'...")
+        
+        # Recargar reglas para puntajes
+        self.score_engine.recargar_reglas_memoria()
+        
+        procesados = 0
+        
+        # Verificamos sesión una vez antes de empezar
+        if hasattr(self.scraper_service, 'verificar_sesion'):
+            self.scraper_service.verificar_sesion(emitir_texto)
+
+        for i, codigo in enumerate(codigos_limpios):
+            try:
+                percent = int(((i+1)/total)*100)
+                emitir_porcentaje(percent)
+                emitir_texto(f"Procesando ({i+1}/{total}): {codigo}")
+
+                # 1. Extraer datos (Usamos lógica de Fase 2 directa)
+                datos = self.scraper_service.extraer_detalle_api(None, codigo)
+                
+                if datos:
+                    # --- Nombre del Organismo ---
+                    org_real = datos.get('organismo_nombre')
+                    if not org_real or len(org_real) < 2:
+                        org_real = "Importado Manual"
+
+                    # 2. Calcular Puntajes
+                    puntos1, det1 = self.score_engine.calcular_puntaje_fase_1({
+                        'nombre': datos.get('descripcion', 'Importado Manualmente')[:100], 
+                        'estado_ca_texto': datos.get('estado'),
+                        'organismo_comprador': org_real
+                    })
+                    puntos2, det2 = self.score_engine.calcular_puntaje_fase_2(datos)
+                    
+                    # 3. Guardar en BD (CORREGIDO CON DATOS FASE 2)
+                    registro_base = [{
+                        "codigo": codigo,
+                        "nombre": datos.get('descripcion', 'Sin Nombre (Manual)'),
+                        "estado": datos.get('estado'),
+                        # AQUÍ MAPEAMOS LOS NUEVOS CAMPOS:
+                        "fecha_publicacion": datos.get('fecha_publicacion'),  # Fecha real extraída
+                        "monto_disponible_CLP": datos.get('monto_estimado'), # Mapeamos 'presupuesto' a 'monto_clp'
+                        "fecha_cierre": datos.get('fecha_cierre_p1'),
+                        "organismo": org_real
+                    }]
+                    
+                    # Paso A: Insertar/Actualizar Base
+                    self.db_service.insertar_o_actualizar_masivo(registro_base)
+                    
+                    # Paso B: Actualizar con detalle completo
+                    self.db_service.actualizar_fase_2_detalle(
+                        codigo_ca=codigo,
+                        datos_fase_2=datos,
+                        puntuacion_total=puntos1 + puntos2,
+                        detalle_completo=det1 + det2
+                    )
+
+                    # 4. Asignar al destino (Pestaña)
+                    with self.db_service.session_factory() as session:
+                        from src.db.db_models import CaLicitacion
+                        lic = session.query(CaLicitacion).filter_by(codigo_ca=codigo).first()
+                        if lic:
+                            if destino == 'seguimiento':
+                                self.db_service.gestionar_favorito(lic.ca_id, True)
+                            elif destino == 'ofertadas':
+                                self.db_service.gestionar_ofertada(lic.ca_id, True)
+                            # Si es 'candidatas', no hacemos nada extra
+
+                    procesados += 1
+                else:
+                    logger.warning(f"No se pudo descargar info para {codigo}")
+                
+                time.sleep(0.2)
+
+            except Exception as e:
+                logger.error(f"Error importando {codigo}: {e}")
+
+        emitir_texto("Importación finalizada.")
+        return procesados
