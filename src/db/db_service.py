@@ -9,7 +9,7 @@ de persistencia de datos, encapsulando la lógica de SQLAlchemy.
 from typing import List, Dict, Tuple, Optional, Union, Set
 from datetime import datetime, timedelta
 from sqlalchemy.orm import sessionmaker, Session, joinedload
-from sqlalchemy import select, delete, or_, update, func
+from sqlalchemy import select, delete, or_, update, func, bindparam
 from sqlalchemy.dialects.postgresql import insert
 
 from .db_models import (
@@ -22,6 +22,7 @@ from .db_models import (
     TipoReglaOrganismo
 )
 from src.utils.logger import configurar_logger
+
 
 logger = configurar_logger(__name__)
 
@@ -191,51 +192,50 @@ class DbService:
                 session.rollback()
                 raise
 
-    def actualizar_puntajes_en_lote(self, actualizaciones: List[Union[Tuple[int, int], Tuple[int, int, List[str]]]]):
+    def actualizar_puntajes_en_lote(self, lista_actualizaciones: List[Tuple[int, int, List[str]]]):
         """
-        Actualiza eficientemente los puntajes de múltiples licitaciones.
-        Divide la carga en lotes pequeños para evitar desconexiones.
+        Actualiza masivamente el puntaje y detalle de las licitaciones.
+        Utiliza SQLAlchemy Core 2.0 para máxima eficiencia (una sola query SQL).
+        
+        Args:
+            lista_actualizaciones: Lista de tuplas (ca_id, nuevo_puntaje, detalle_lista)
         """
-        if not actualizaciones: 
+        if not lista_actualizaciones:
             return
-        
-        # 1. Preparar todos los datos en memoria
-        datos_mapeados = []
-        for item in actualizaciones:
-            if len(item) == 3:
-                ca_id, puntaje, detalle = item
-            elif len(item) == 2:
-                ca_id, puntaje = item
-                detalle = ["Puntaje Base (Sin detalle)"]
-            else:
-                continue
-            
-            datos_mapeados.append({
-                "ca_id": ca_id, 
-                "puntuacion_final": puntaje, 
-                "puntaje_detalle": list(detalle) 
-            })
-            
-        # 2. Enviar a la BD en lotes seguros (Batching)
-        TAMANO_LOTE = 500 # Procesamos de a 500 para que la BD respire
-        
-        with self.session_factory() as session:
-            try: 
-                total_items = len(datos_mapeados)
-                
-                for i in range(0, total_items, TAMANO_LOTE):
-                    lote_actual = datos_mapeados[i : i + TAMANO_LOTE]
-                    
-                    session.bulk_update_mappings(CaLicitacion, lote_actual)
-                    session.commit() # Guardamos cambios parciales
-                    
-                    logger.debug(f"Guardado lote de puntajes: {i + len(lote_actual)} / {total_items}")
-                    
-            except Exception as e:
-                logger.error(f"Error crítico en update lote: {e}")
-                session.rollback()
-                raise
 
+        # 1. Preparamos los datos en formato de diccionario para bindparam
+        # Usamos prefijos 'b_' para diferenciar los parámetros de las columnas
+        datos_para_update = [
+            {
+                "b_ca_id": ca_id,
+                "b_puntuacion": puntaje,
+                "b_detalle": detalle  # SQLAlchemy serializará esto a JSON automáticamente
+            }
+            for ca_id, puntaje, detalle in lista_actualizaciones
+        ]
+
+        # 2. Definimos la sentencia SQL genérica
+        stmt = (
+            update(CaLicitacion)
+            .where(CaLicitacion.ca_id == bindparam("b_ca_id"))
+            .values(
+                puntuacion_final=bindparam("b_puntuacion"),
+                puntaje_detalle=bindparam("b_detalle")
+            )
+        )
+
+        # 3. Ejecutamos la transacción
+        # El session_factory crea una sesión, ejecuta y cierra automáticamente.
+        with self.session_factory() as session:
+            try:
+                session.connection().execute(stmt, datos_para_update)
+                session.commit()
+                logger.info(f"Actualizados {len(datos_para_update)} puntajes correctamente.")
+            except Exception as e:
+                session.rollback()
+                logger.error(f"Error en actualización masiva de puntajes: {e}")
+                raise e
+            
     # --- CONSULTAS DE DATOS ---
 
     def obtener_licitacion_por_id(self, ca_id: int) -> Optional[CaLicitacion]:
@@ -533,22 +533,20 @@ class DbService:
     def obtener_todos_organismos(self) -> List[CaOrganismo]:
         with self.session_factory() as session: 
             return session.scalars(select(CaOrganismo).order_by(CaOrganismo.nombre)).all()
+        
+    def _ejecutar_exportacion(self, metodo_obtencion, **kwargs) -> List[Dict]:
+        registros = metodo_obtencion(**kwargs)
+        return self._convertir_a_diccionario_seguro(registros)
             
     # --- EXPORTACIÓN PARA EXCEL ---
     def exportar_candidatas(self) -> List[Dict]:
-        with self.session_factory() as session: 
-            objs = self.obtener_candidatas_filtradas(umbral_minimo=0)
-            return self._convertir_a_diccionario_seguro(objs)
-            
+        return self._ejecutar_exportacion(self.obtener_candidatas_filtradas, umbral_minimo=0)
+
     def exportar_seguimiento(self) -> List[Dict]:
-        with self.session_factory() as session: 
-            objs = self.obtener_licitaciones_seguimiento()
-            return self._convertir_a_diccionario_seguro(objs)
-            
+        return self._ejecutar_exportacion(self.obtener_licitaciones_seguimiento)
+
     def exportar_ofertadas(self) -> List[Dict]:
-        with self.session_factory() as session: 
-            objs = self.obtener_licitaciones_ofertadas()
-            return self._convertir_a_diccionario_seguro(objs)
+        return self._ejecutar_exportacion(self.obtener_licitaciones_ofertadas)
         
     def exportar_config_keywords(self) -> List[Dict]:
         """Retorna lista de diccionarios con todas las keywords y sus puntajes."""

@@ -7,6 +7,7 @@ Implementa lógica de 'Masking' para evitar puntuación doble en frases contenid
 """
 import unicodedata
 import json
+from functools import lru_cache
 from typing import Dict, List, Tuple, Any, Set
 from src.utils.logger import configurar_logger
 from config.config import PUNTOS_SEGUNDO_LLAMADO
@@ -83,10 +84,13 @@ class MotorPuntajes:
         except Exception as e:
             logger.error(f"Error mapeando nombres de organismos: {e}")
 
-    def _normalizar_texto(self, texto: Any) -> str: 
-        """Estandariza texto: minúsculas, sin tildes, sin espacios dobles."""
-        if not texto: return ""
-        s = ''.join(c for c in unicodedata.normalize('NFD', str(texto).lower()) if unicodedata.category(c) != 'Mn')
+    @lru_cache(maxsize=4096)
+    def _normalizar_texto(self, texto: Any) -> str:
+        if not texto:
+            return ""
+        
+        texto_str = str(texto)
+        s = ''.join(c for c in unicodedata.normalize('NFD', texto_str.lower()) if unicodedata.category(c) != 'Mn')
         return " ".join(s.split())
 
     def _evaluar_con_masking(self, texto_base: str, campo_puntaje: str, etiqueta: str) -> Tuple[int, List[str]]:

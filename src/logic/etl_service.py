@@ -231,34 +231,52 @@ class ServicioEtl:
         emitir_texto("Actualización finalizada.")
         emitir_porcentaje(100)
 
-    def _procesar_detalle_lote(self, lista_cas, emitir_texto, emitir_porcentaje):
-        total = len(lista_cas)
-        self.score_engine.recargar_reglas_memoria() 
-
-        for i, lic in enumerate(lista_cas):
-            percent = int(((i+1)/total)*100)
-            emitir_porcentaje(percent)
-            emitir_texto(f"Actualizando: {lic.codigo_ca}")
+    def _procesar_detalle_lote(self, candidatas: List, emitir_texto, emitir_porcentaje):
+        total = len(candidatas)
+        procesados = 0
+        
+        for idx, item in enumerate(candidatas):
+            codigo = item['codigo']
+            
             try:
-                datos = self.scraper_service.extraer_detalle_api(None, lic.codigo_ca, emitir_texto)
-                if datos:
-                    item_f1 = {
-                        'nombre': lic.nombre, 
-                        'estado_ca_texto': lic.estado_ca_texto, 
-                        'organismo_comprador': lic.organismo.nombre if lic.organismo else ""
-                    }
-                    pts1, det1 = self.score_engine.calcular_puntaje_fase_1(item_f1)
-                    pts2, det2 = self.score_engine.calcular_puntaje_fase_2(datos)
+                # datos ahora es un Objeto Pydantic (LicitacionDetalleSchema)
+                datos_obj = self.scraper_service.extraer_detalle_api(None, codigo)
+
+                if datos_obj:
+                    # CONVERSIÓN CRÍTICA: Transformamos a dict para compatibilidad
+                    datos = datos_obj.model_dump()
+
+                    # 1. Calcular Puntaje Fase 2 (Productos + Descripción)
+                    pts_prod, det_prod = self.score_engine.calcular_puntaje_fase_2(datos)
                     
+                    # 2. Recalcular total
+                    puntos_base = item.get('puntos_base', 0)
+                    nuevo_total = puntos_base + pts_prod
+                    nuevo_detalle = (item.get('detalle_base') or []) + det_prod
+
+                    # 3. Guardar en BD (Fase 2)
                     self.db_service.actualizar_fase_2_detalle(
-                        codigo_ca=lic.codigo_ca, 
-                        datos_fase_2=datos, 
-                        puntuacion_total=pts1 + pts2, 
-                        detalle_completo=det1 + det2
+                        codigo_ca=codigo,
+                        datos_fase_2=datos,
+                        puntuacion_total=nuevo_total,
+                        detalle_completo=nuevo_detalle
                     )
-                time.sleep(0.1)
+                    
+                    procesados += 1
+                else:
+                    logger.warning(f"No se pudo descargar info para {codigo}")
+                
+                # Pequeña pausa para no saturar CPU en bucles muy rápidos
+                time.sleep(0.05) 
+
+                if idx % 5 == 0:
+                    progreso = 30 + int((idx / total) * 60)
+                    emitir_porcentaje(progreso)
+
             except Exception as e:
-                logger.error(f"Error procesando {lic.codigo_ca}: {e}")
+                logger.error(f"Error procesando detalle {codigo}: {e}")
+
+        emitir_texto("Fase 2 Completada.")
 
     def ejecutar_limpieza_automatica(self):
         try: 
